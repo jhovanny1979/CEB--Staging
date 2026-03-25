@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Comercio e-Bogota</string>
+    <string name="title_activity_main">Comercio e-Bogota</string>
+    <string name="package_name">co.comercioebogota.app</string>
+    <string name="custom_url_scheme">co.comercioebogota.app</string>
+</resources>

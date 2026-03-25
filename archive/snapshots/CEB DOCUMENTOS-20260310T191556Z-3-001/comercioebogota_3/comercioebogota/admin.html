@@ -1,0 +1,651 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin â€” Comercio e-BogotÃ¡</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <style>
+    body{background:#080808}
+    #adminLogin{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse 60% 60% at 50% 40%,rgba(201,168,76,.07) 0%,transparent 70%)}
+    .alb{width:100%;max-width:400px;background:var(--dark-2);border:1px solid var(--border);border-radius:20px;padding:44px 40px}
+    .adm-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(229,85,85,.1);border:1px solid rgba(229,85,85,.2);color:#E55;padding:4px 12px;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
+    #adminPanel{display:none}
+    .admin-wrap{display:flex;min-height:100vh}
+    .admin-sidebar{width:220px;flex-shrink:0;background:var(--dark-2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .sb-head{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
+    .sb-head .lr{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+    .sb-head .lr svg{width:24px;height:24px}
+    .sb-head .brand{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600}
+    .sb-head .brand em{font-style:normal;color:var(--gold)}
+    .sb-head .abadge{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:#E55;background:rgba(229,85,85,.1);border:1px solid rgba(229,85,85,.2);border-radius:4px;padding:2px 7px}
+    .admin-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+    .nav-sec{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);padding:12px 10px 6px}
+    .al{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:.84rem;color:var(--text-muted);transition:background .15s,color .15s;text-decoration:none;border:1px solid transparent}
+    .al:hover{background:var(--dark-3);color:var(--text)}
+    .al.active{background:rgba(201,168,76,.1);color:var(--gold);border-color:rgba(201,168,76,.12)}
+    .al .ico{font-size:.92rem;width:17px;flex-shrink:0}
+    .al .abg{margin-left:auto;background:rgba(229,85,85,.15);color:#E55;font-family:'DM Mono',monospace;font-size:.6rem;padding:1px 7px;border-radius:10px}
+    .al .abg.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .sb-foot{padding:12px 10px;border-top:1px solid var(--border)}
+    .admin-body{flex:1;display:flex;flex-direction:column;min-width:0}
+    .topbar{height:56px;background:var(--dark-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+    .topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:500}
+    .admin-content{flex:1;padding:28px 30px;overflow-y:auto}
+    .asec{display:none}.asec.active{display:block}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .kpi{background:var(--dark-2);border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:border-color .2s}
+    .kpi:hover{border-color:var(--gold-dim)}
+    .kpi-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+    .kpi-val{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;line-height:1;color:var(--gold-light)}
+    .kpi-sub{font-size:.72rem;color:var(--text-muted);margin-top:6px}
+    .kpi-up{color:#2ECC71;font-weight:700}.kpi-dn{color:#E55;font-weight:700}
+    .dash-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+    .chart-card{background:var(--dark-2);border:1px solid var(--border);border-radius:14px;padding:22px}
+    .chart-card h4{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px}
+    .bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px}
+    .bar-group{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+    .bar{width:100%;border-radius:4px 4px 0 0;background:var(--gold-dim);min-height:4px;transition:height .4s}
+    .bar.hi{background:var(--gold)}
+    .bar-lbl{font-size:.6rem;color:var(--text-muted)}
+    .donut-wrap{display:flex;align-items:center;gap:20px}
+    .dlegend{display:flex;flex-direction:column;gap:8px}
+    .dleg-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-muted)}
+    .dleg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .act-feed{display:flex;flex-direction:column}
+    .act-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .act-item:last-child{border-bottom:none}
+    .ai-ico{width:32px;height:32px;border-radius:8px;background:var(--dark-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .ai-txt{font-size:.82rem;line-height:1.5}.ai-txt strong{color:var(--gold-light)}
+    .ai-time{font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:3px}
+    .tw{background:var(--dark-2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:22px}
+    .tw-head{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .tw-head h3{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600}
+    .ts{display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:8px;padding:7px 12px}
+    .ts input{background:none;border:none;outline:none;color:var(--text);font-size:.84rem;width:190px}
+    .ts input::placeholder{color:var(--text-muted)}
+    .ftabs{display:flex;gap:0;background:var(--dark-3);border-radius:8px;padding:3px;margin:14px 22px 0}
+    .ftab{padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:500;color:var(--text-muted);transition:all .15s}
+    .ftab.active{background:var(--dark-2);color:var(--gold);box-shadow:0 1px 6px rgba(0,0,0,.3)}
+    table{width:100%;border-collapse:collapse}
+    thead tr{border-bottom:1px solid var(--border)}
+    thead th{padding:11px 16px;text-align:left;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:400;white-space:nowrap}
+    tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:rgba(255,255,255,.025)}
+    tbody td{padding:12px 16px;font-size:.84rem;vertical-align:middle}
+    .tn{font-weight:600}.tm{color:var(--text-muted);font-size:.8rem}.tmo{font-family:'DM Mono',monospace;font-size:.74rem;color:var(--gold)}
+    .tact{display:flex;gap:6px;flex-wrap:wrap}
+    .ab{padding:5px 11px;border-radius:6px;border:1px solid var(--border);font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;background:none;color:var(--text-muted);white-space:nowrap}
+    .ab:hover{background:var(--dark-3);color:var(--text)}
+    .ab.pri{background:var(--gold);color:var(--dark);border-color:var(--gold)}.ab.pri:hover{background:var(--gold-light)}
+    .ab.suc{color:#2ECC71;border-color:rgba(46,204,113,.2)}.ab.suc:hover{background:rgba(46,204,113,.1)}
+    .ab.dan{color:#E55;border-color:rgba(229,85,85,.2)}.ab.dan:hover{background:rgba(229,85,85,.1)}
+    .s-act{background:rgba(46,204,113,.12);color:#2ECC71;border:1px solid rgba(46,204,113,.2)}
+    .s-pen{background:rgba(255,193,7,.1);color:#FFC107;border:1px solid rgba(255,193,7,.2)}
+    .s-exp{background:rgba(229,85,85,.1);color:#E55;border:1px solid rgba(229,85,85,.2)}
+    .s-fre{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid var(--border)}
+    .dm{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:800;display:none;align-items:flex-start;justify-content:flex-end}
+    .dm.open{display:flex}
+    .dp{width:460px;height:100vh;overflow-y:auto;background:var(--dark-2);border-left:1px solid var(--border);padding:26px;display:flex;flex-direction:column;gap:18px;animation:sli .25s ease}
+    @keyframes sli{from{transform:translateX(100%)}to{transform:none}}
+    .dp-hd{display:flex;align-items:center;justify-content:space-between}
+    .dp-hd h3{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600}
+    .dp-cl{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.1rem;padding:6px 10px;border-radius:7px;transition:background .15s}
+    .dp-cl:hover{background:var(--dark-3);color:var(--text)}
+    .dp-field{display:flex;flex-direction:column;gap:4px}
+    .dp-key{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+    .dp-val{font-size:.875rem;line-height:1.6}
+    .dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .dp-div{height:1px;background:var(--border)}
+    .dp-acts{display:flex;flex-direction:column;gap:8px}
+    .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .sc{background:var(--dark-2);border:1px solid var(--border);border-radius:14px;padding:22px}
+    .sc h4{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+    .sc-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .sc-row:last-child{border-bottom:none}
+    .sc-row label{font-size:.84rem;color:var(--text-muted)}
+    .tog{width:38px;height:20px;border-radius:10px;background:var(--dark-4);border:1px solid var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+    .tog.on{background:#2ECC71;border-color:#2ECC71}
+    .tog::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:white;transition:transform .2s}
+    .tog.on::after{transform:translateX(18px)}
+    @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.dash-row{grid-template-columns:1fr}}
+    @media(max-width:900px){.admin-sidebar{width:52px}.sb-head .brand,.al span:not(.ico),.nav-sec,.abg{display:none}.admin-content{padding:16px}}
+    @media(max-width:640px){.kpi-grid{grid-template-columns:1fr 1fr}.sc-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="adminLogin">
+  <div class="alb">
+    <div class="adm-badge">âš™ Administrador de plataforma</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:26px">
+      <svg style="width:30px;height:30px" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" stroke="#C9A84C" stroke-width="2.5"/><path d="M18 40 Q40 14 62 40" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M20 41 Q40 66 60 41" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="40" cy="40" r="3.5" fill="#C9A84C"/></svg>
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600">Comercio <em style="font-style:normal;color:var(--gold)">eÂ·BogotÃ¡</em></div>
+        <div style="font-size:.72rem;color:var(--text-muted)">Panel de AdministraciÃ³n</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Usuario administrador</label><input type="text" class="form-input" id="adminUser" placeholder="admin" /></div>
+      <div class="form-group"><label class="form-label">ContraseÃ±a</label><input type="password" class="form-input" id="adminPw" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" /></div>
+      <div id="adminErr" class="alert alert-error" style="display:none"><span>âœ•</span> Credenciales incorrectas.</div>
+      <button class="btn btn-gold btn-full btn-lg" onclick="doLogin()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Ingresar
+      </button>
+    </div>
+    <p style="text-align:center;font-size:.72rem;color:var(--text-muted);margin-top:18px">Demo â€” usuario: <code>admin</code> / clave: <code>admin123</code></p>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="adminPanel">
+  <div class="admin-wrap">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="sb-head">
+        <div class="lr">
+          <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" stroke="#C9A84C" stroke-width="2.5"/><path d="M18 40 Q40 14 62 40" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M20 41 Q40 66 60 41" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="40" cy="40" r="3.5" fill="#C9A84C"/></svg>
+          <span class="brand">eÂ·<em>BogotÃ¡</em></span>
+        </div>
+        <span class="abadge">Admin</span>
+      </div>
+      <nav class="admin-nav">
+        <div class="nav-sec">Principal</div>
+        <a class="al active" onclick="nav('dashboard',this)"><span class="ico">ðŸ“Š</span><span>Dashboard</span></a>
+        <a class="al" onclick="nav('negocios',this)"><span class="ico">ðŸª</span><span>Negocios</span><span class="abg gold" id="sbNegocios">0</span></a>
+        <a class="al" onclick="nav('suscripciones',this)"><span class="ico">ðŸ’³</span><span>Suscripciones</span><span class="abg" id="sbPendientes">0</span></a>
+        <a class="al" onclick="nav('usuarios',this)"><span class="ico">ðŸ‘¥</span><span>Usuarios</span></a>
+        <a class="al" onclick="nav('promociones',this)"><span class="ico">ðŸ“£</span><span>Promociones</span></a>
+        <div class="nav-sec">Herramientas</div>
+        <a class="al" onclick="nav('codigos',this)"><span class="ico">ðŸŽŸï¸</span><span>CÃ³digos promo</span></a>
+        <a class="al" onclick="nav('reportes',this)"><span class="ico">ðŸ“ˆ</span><span>Reportes</span></a>
+        <a class="al" onclick="nav('config',this)"><span class="ico">âš™ï¸</span><span>ConfiguraciÃ³n</span></a>
+        <div class="nav-sec">Accesos</div>
+        <a class="al" href="index.html" target="_blank"><span class="ico">ðŸŒ</span><span>Ver plataforma</span></a>
+        <a class="al" href="panel.html" target="_blank"><span class="ico">ðŸ‘¤</span><span>Panel cliente</span></a>
+      </nav>
+      <div class="sb-foot"><button class="al" style="width:100%;border:none;cursor:pointer" onclick="doLogout()"><span class="ico">ðŸšª</span><span>Cerrar sesiÃ³n</span></button></div>
+    </aside>
+
+    <!-- BODY -->
+    <div class="admin-body">
+      <div class="topbar">
+        <div class="topbar-title" id="tbTitle">Dashboard</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:.8rem;color:var(--text-muted)">SesiÃ³n: <strong id="tbUser">admin</strong></span>
+          <div style="width:30px;height:30px;border-radius:50%;background:rgba(229,85,85,.15);border:1px solid rgba(229,85,85,.25);display:flex;align-items:center;justify-content:center;font-size:.8rem">âš™</div>
+        </div>
+      </div>
+      <div class="admin-content">
+
+        <!-- DASHBOARD -->
+        <div class="asec active" id="s-dashboard">
+          <div class="kpi-grid">
+            <div class="kpi"><div class="kpi-lbl">Negocios registrados</div><div class="kpi-val" id="k-total">0</div><div class="kpi-sub"><span class="kpi-up">â†‘ +2</span> esta semana</div></div>
+            <div class="kpi"><div class="kpi-lbl">Suscripciones activas</div><div class="kpi-val" id="k-act">0</div><div class="kpi-sub"><span class="kpi-up">â†‘ +1</span> este mes</div></div>
+            <div class="kpi"><div class="kpi-lbl">Pagos pendientes</div><div class="kpi-val" id="k-pen" style="color:#FFC107">0</div><div class="kpi-sub">Esperando verificaciÃ³n</div></div>
+            <div class="kpi"><div class="kpi-lbl">Ingresos este mes</div><div class="kpi-val" id="k-ing" style="font-size:1.7rem">$0</div><div class="kpi-sub">Suscripciones pagadas</div></div>
+          </div>
+          <div class="dash-row">
+            <div class="chart-card"><h4>Registros por mes</h4><div class="bar-chart" id="barChart"></div><div style="display:flex;gap:8px;margin-top:8px" id="barLbls"></div></div>
+            <div class="chart-card"><h4>DistribuciÃ³n de planes</h4><div class="donut-wrap"><svg width="90" height="90" viewBox="0 0 90 90" id="donutSvg"></svg><div class="dlegend" id="donutLgd"></div></div></div>
+          </div>
+          <div class="tw"><div class="tw-head"><h3>Actividad reciente</h3></div><div style="padding:0 20px" id="actFeed"></div></div>
+        </div>
+
+        <!-- NEGOCIOS -->
+        <div class="asec" id="s-negocios">
+          <div class="tw">
+            <div class="tw-head">
+              <h3>Todos los negocios</h3>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div class="ts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="qNegocios" placeholder="Buscar negocio..." oninput="renderNegocios()"/></div>
+                <button class="ab pri" onclick="exportCSV()">â†“ Exportar CSV</button>
+              </div>
+            </div>
+            <div class="ftabs">
+              <div class="ftab active" onclick="setFilter('todos',this)">Todos</div>
+              <div class="ftab" onclick="setFilter('activo',this)">Activos</div>
+              <div class="ftab" onclick="setFilter('pendiente',this)">Pendientes</div>
+              <div class="ftab" onclick="setFilter('vencido',this)">Vencidos</div>
+              <div class="ftab" onclick="setFilter('gratis',this)">Prueba</div>
+            </div>
+            <div style="overflow-x:auto;padding-top:4px">
+              <table><thead><tr><th>Negocio / Email</th><th>CategorÃ­a</th><th>Localidad</th><th>Plan</th><th>Estado</th><th>Vence</th><th>Acciones</th></tr></thead>
+              <tbody id="bNegocios"></tbody></table>
+            </div>
+            <div id="emNegocios" style="display:none;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:2rem;margin-bottom:8px">ðŸª</div>Sin resultados.</div>
+          </div>
+        </div>
+
+        <!-- SUSCRIPCIONES -->
+        <div class="asec" id="s-suscripciones">
+          <div class="tw" style="margin-bottom:20px">
+            <div class="tw-head"><h3>Pagos pendientes</h3><span class="badge badge-red" id="penCount" style="font-size:.7rem">0</span></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr><th>Negocio</th><th>Plan</th><th>Valor</th><th>Medio</th><th>Fecha</th><th>Acciones</th></tr></thead>
+              <tbody id="bPendientes"></tbody></table>
+            </div>
+            <div id="emPend" style="display:none;text-align:center;padding:32px;color:var(--text-muted)"><div style="font-size:2rem;margin-bottom:8px">âœ…</div>No hay pagos pendientes.</div>
+          </div>
+          <div class="tw">
+            <div class="tw-head"><h3>Suscripciones activas</h3></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr><th>Negocio</th><th>Plan</th><th>Valor</th><th>Inicio</th><th>Vence</th><th>Estado</th></tr></thead>
+              <tbody id="bHistorial"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- USUARIOS -->
+        <div class="asec" id="s-usuarios">
+          <div class="tw">
+            <div class="tw-head"><h3>Usuarios registrados</h3><div class="ts"><input type="text" id="qUsuarios" placeholder="Buscar..." oninput="renderUsuarios()"/></div></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Correo</th><th>Negocio</th><th>Registro</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="bUsuarios"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- PROMOCIONES -->
+        <div class="asec" id="s-promociones">
+          <div class="tw">
+            <div class="tw-head"><h3>Promociones en la plataforma</h3></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Negocio</th><th>TÃ­tulo</th><th>Publicada</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="bPromos"></tbody></table></div>
+            <div id="emPromos" style="display:none;text-align:center;padding:32px;color:var(--text-muted)"><div style="font-size:2rem;margin-bottom:8px">ðŸ“£</div>Sin promociones.</div>
+          </div>
+        </div>
+
+        <!-- CÃ“DIGOS -->
+        <div class="asec" id="s-codigos">
+          <div class="tw">
+            <div class="tw-head"><h3>CÃ³digos promocionales</h3><button class="ab pri" onclick="genCodigo()">+ Generar cÃ³digo</button></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>CÃ³digo</th><th>DÃ­as</th><th>Generado</th><th>Usado por</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="bCodigos"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- REPORTES -->
+        <div class="asec" id="s-reportes">
+          <div class="kpi-grid" style="margin-bottom:24px">
+            <div class="kpi"><div class="kpi-lbl">Ingresos confirmados</div><div class="kpi-val" id="r-ing" style="font-size:1.7rem">$0</div></div>
+            <div class="kpi"><div class="kpi-lbl">ProyecciÃ³n prÃ³ximo mes</div><div class="kpi-val" id="r-proy" style="font-size:1.7rem">$0</div></div>
+            <div class="kpi"><div class="kpi-lbl">Tasa de conversiÃ³n</div><div class="kpi-val" id="r-conv" style="font-size:2rem">0%</div><div class="kpi-sub">Prueba â†’ Pago</div></div>
+            <div class="kpi"><div class="kpi-lbl">Vencen en 5 dÃ­as</div><div class="kpi-val" id="r-venc" style="font-size:2rem;color:#FFC107">0</div></div>
+          </div>
+          <div class="tw">
+            <div class="tw-head"><h3>PrÃ³ximos vencimientos (30 dÃ­as)</h3></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Vence</th><th>DÃ­as restantes</th><th>Alertar</th></tr></thead><tbody id="bVenc"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- CONFIG -->
+        <div class="asec" id="s-config">
+          <div class="sc-grid">
+            <div class="sc"><h4>Precios de planes</h4>
+              <div class="sc-row"><label>Plan 1 mes ($/mes)</label><input type="number" class="form-input" value="25000" style="width:110px;text-align:right"/></div>
+              <div class="sc-row"><label>Plan 3 meses ($/mes)</label><input type="number" class="form-input" value="24000" style="width:110px;text-align:right"/></div>
+              <div class="sc-row"><label>Plan 6 meses ($/mes)</label><input type="number" class="form-input" value="23000" style="width:110px;text-align:right"/></div>
+              <div class="sc-row"><label>Plan 12 meses ($/mes)</label><input type="number" class="form-input" value="21000" style="width:110px;text-align:right"/></div>
+              <button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="showToast('Precios actualizados âœ“','success')">Guardar</button>
+            </div>
+            <div class="sc"><h4>LÃ­mites de la plataforma</h4>
+              <div class="sc-row"><label>MÃ¡x. imÃ¡genes por negocio</label><input type="number" class="form-input" value="10" style="width:70px;text-align:right"/></div>
+              <div class="sc-row"><label>MÃ¡x. promociones por mes</label><input type="number" class="form-input" value="4" style="width:70px;text-align:right"/></div>
+              <div class="sc-row"><label>DÃ­as de prueba gratuita</label><input type="number" class="form-input" value="30" style="width:70px;text-align:right"/></div>
+              <div class="sc-row"><label>DÃ­as aviso vencimiento</label><input type="number" class="form-input" value="5" style="width:70px;text-align:right"/></div>
+              <button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="showToast('LÃ­mites guardados âœ“','success')">Guardar</button>
+            </div>
+            <div class="sc"><h4>Notificaciones</h4>
+              <div class="sc-row"><label>Alerta 5 dÃ­as antes del vencimiento</label><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="sc-row"><label>NotificaciÃ³n nuevo registro</label><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="sc-row"><label>ConfirmaciÃ³n automÃ¡tica de pago</label><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+              <div class="sc-row"><label>Resumen semanal por correo</label><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="sc"><h4>Acceso administrador</h4>
+              <div class="form-group" style="margin-bottom:12px"><label class="form-label">Usuario</label><input type="text" class="form-input" value="admin"/></div>
+              <div class="form-group" style="margin-bottom:14px"><label class="form-label">Nueva contraseÃ±a</label><input type="password" class="form-input" placeholder="Nueva contraseÃ±a"/></div>
+              <button class="btn btn-gold btn-sm" onclick="showToast('Credenciales actualizadas âœ“','success')">Actualizar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL (slide-in) -->
+<div class="dm" id="detailModal">
+  <div style="flex:1;cursor:pointer" onclick="closeDetail()"></div>
+  <div class="dp" id="detailPanel"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+// â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const SEED = [
+  {id:1,nombre:'PanaderÃ­a San JosÃ©',     email:'sanjose@gmail.com',    cat:'PanaderÃ­as',        loc:'Kennedy',       plan:'3 Meses',  val:72000,  est:'activo',   ini:'2024-01-10',vence:'2024-04-10',medio:'Nequi',       fotos:8, promos:2},
+  {id:2,nombre:'FerreterÃ­a El Perno',    email:'perno@hotmail.com',    cat:'FerreterÃ­as',       loc:'Puente Aranda', plan:'6 Meses',  val:138000, est:'activo',   ini:'2024-01-05',vence:'2024-07-05',medio:'Bancolombia', fotos:5, promos:1},
+  {id:3,nombre:'EstÃ©tica Glamour',       email:'glamour@gmail.com',    cat:'Salas de belleza',  loc:'Chapinero',     plan:'1 Mes',    val:25000,  est:'pendiente',ini:'2024-02-01',vence:'2024-03-01',medio:'Efecty',     fotos:10,promos:3},
+  {id:4,nombre:'Restaurante El Sabor',   email:'sabor@yahoo.com',      cat:'Restaurantes',      loc:'UsaquÃ©n',       plan:'12 Meses', val:252000, est:'activo',   ini:'2023-12-01',vence:'2024-12-01',medio:'Daviplata',  fotos:10,promos:4},
+  {id:5,nombre:'DroguerÃ­a La Salud',     email:'salud@gmail.com',      cat:'DroguerÃ­as',        loc:'Bosa',          plan:'3 Meses',  val:72000,  est:'vencido',  ini:'2023-10-01',vence:'2024-01-01',medio:'Nequi',       fotos:3, promos:0},
+  {id:6,nombre:'Veterinaria Pelitos',    email:'pelitos@gmail.com',    cat:'Veterinarias',      loc:'Suba',          plan:'GRATIS',   val:0,      est:'gratis',   ini:'2024-02-10',vence:'2024-03-10',medio:'â€”',           fotos:2, promos:0},
+  {id:7,nombre:'Taller RÃ¡pidoFix',       email:'rapidofix@gmail.com',  cat:'Talleres mecÃ¡nicos',loc:'FontibÃ³n',      plan:'1 Mes',    val:25000,  est:'pendiente',ini:'2024-02-14',vence:'2024-03-14',medio:'Baloto',     fotos:6, promos:1},
+  {id:8,nombre:'FlorerÃ­a Las Rosas',     email:'rosas@gmail.com',      cat:'FloristerÃ­as',      loc:'Teusaquillo',   plan:'6 Meses',  val:138000, est:'activo',   ini:'2024-01-20',vence:'2024-07-20',medio:'Mercado Pago',fotos:9, promos:2},
+];
+const CODES = [
+  {code:'DEMO30D1',dias:30,gen:'2024-01-15',uso:'Veterinaria Pelitos',est:'usado'},
+  {code:'PROMO2024',dias:30,gen:'2024-02-01',uso:'â€”',est:'activo'},
+  {code:'BOGO2024A',dias:30,gen:'2024-02-10',uso:'â€”',est:'activo'},
+];
+let data = [...SEED], codes = [...CODES], curFilter = 'todos';
+const SC = {activo:'s-act',pendiente:'s-pen',vencido:'s-exp',gratis:'s-fre'};
+const SL = {activo:'Activo',pendiente:'Pendiente',vencido:'Vencido',gratis:'Prueba'};
+
+// â”€â”€ AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function doLogin(){
+  const u=document.getElementById('adminUser').value.trim(), p=document.getElementById('adminPw').value;
+  if(u==='admin'&&p==='admin123'){
+    document.getElementById('adminErr').style.display='none';
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminPanel').style.display='block';
+    document.getElementById('tbUser').textContent=u;
+    initAll();
+  } else { document.getElementById('adminErr').style.display='flex'; }
+}
+function doLogout(){document.getElementById('adminPanel').style.display='none';document.getElementById('adminLogin').style.display='flex';}
+document.getElementById('adminPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('adminUser').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+// â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const TITLES={dashboard:'Dashboard',negocios:'Negocios',suscripciones:'Suscripciones y Pagos',usuarios:'Usuarios',promociones:'Promociones',codigos:'CÃ³digos Promocionales',reportes:'Reportes',config:'ConfiguraciÃ³n'};
+function nav(name,el){
+  document.querySelectorAll('.asec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.al').forEach(l=>l.classList.remove('active'));
+  const s=document.getElementById('s-'+name); if(s)s.classList.add('active');
+  if(el)el.classList.add('active');
+  document.getElementById('tbTitle').textContent=TITLES[name]||name;
+}
+
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function initAll(){
+  loadKPIs(); drawChart(); drawDonut(); renderActivity();
+  renderNegocios(); renderPendientes(); renderHistorial();
+  renderUsuarios(); renderPromos(); renderCodigos(); renderVenc(); loadReportes();
+}
+
+function loadKPIs(){
+  const act=data.filter(n=>n.est==='activo').length;
+  const pen=data.filter(n=>n.est==='pendiente').length;
+  const ing=data.filter(n=>n.est==='activo').reduce((a,n)=>a+n.val,0);
+  document.getElementById('k-total').textContent=data.length;
+  document.getElementById('k-act').textContent=act;
+  document.getElementById('k-pen').textContent=pen;
+  document.getElementById('k-ing').textContent='$'+ing.toLocaleString('es-CO');
+  document.getElementById('sbNegocios').textContent=data.length;
+  document.getElementById('sbPendientes').textContent=pen;
+  document.getElementById('penCount').textContent=pen+' pendiente'+(pen!==1?'s':'');
+}
+
+function drawChart(){
+  const months=['Sep','Oct','Nov','Dic','Ene','Feb'], vals=[3,5,4,7,6,data.length];
+  const mx=Math.max(...vals);
+  document.getElementById('barChart').innerHTML=vals.map((v,i)=>`<div class="bar-group"><div class="bar ${i===vals.length-1?'hi':''}" style="height:${Math.round(v/mx*95)}px"></div></div>`).join('');
+  document.getElementById('barLbls').innerHTML=months.map(m=>`<div style="flex:1;text-align:center;font-size:.6rem;color:var(--text-muted)">${m}</div>`).join('');
+}
+
+function drawDonut(){
+  const planes={};
+  data.forEach(n=>{planes[n.plan]=(planes[n.plan]||0)+1});
+  const colors=['#C9A84C','#E2C97E','#8A6E2F','#2ECC71','#FFC107','#4A90E2'];
+  const total=data.length||1, entries=Object.entries(planes);
+  let ang=0;
+  const paths=entries.map(([p,c],i)=>{
+    const s=(c/total)*360,pa=descArc(45,45,38,ang,ang+s);ang+=s;
+    return `<path d="${pa}" fill="${colors[i%colors.length]}"/>`;
+  });
+  document.getElementById('donutSvg').innerHTML=paths.join('')+`<circle cx="45" cy="45" r="24" fill="#161616"/><text x="45" y="50" text-anchor="middle" fill="#E2C97E" font-size="12" font-family="Cormorant Garamond,serif" font-weight="600">${total}</text>`;
+  document.getElementById('donutLgd').innerHTML=entries.map(([p,c],i)=>`<div class="dleg-item"><div class="dleg-dot" style="background:${colors[i%colors.length]}"></div>${p} â€” ${c}</div>`).join('');
+}
+
+function descArc(cx,cy,r,a1,a2){
+  const r2=a=>(a-90)*Math.PI/180;
+  const x1=cx+r*Math.cos(r2(a1)),y1=cy+r*Math.sin(r2(a1));
+  const x2=cx+r*Math.cos(r2(a2)),y2=cy+r*Math.sin(r2(a2));
+  return `M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 ${a2-a1>180?1:0} 1 ${x2} ${y2} Z`;
+}
+
+function renderActivity(){
+  const acts=[
+    {ico:'ðŸª',txt:'<strong>FlorerÃ­a Las Rosas</strong> publicÃ³ su negocio',t:'Hace 10 min'},
+    {ico:'ðŸ’³',txt:'<strong>Taller RÃ¡pidoFix</strong> enviÃ³ soporte de pago',t:'Hace 32 min'},
+    {ico:'ðŸ“£',txt:'<strong>Restaurante El Sabor</strong> creÃ³ nueva promociÃ³n',t:'Hace 1h'},
+    {ico:'ðŸ†•',txt:'<strong>EstÃ©tica Glamour</strong> se registrÃ³ en la plataforma',t:'Hace 2h'},
+    {ico:'âœ…',txt:'SuscripciÃ³n activada: <strong>PanaderÃ­a San JosÃ©</strong>',t:'Ayer 15:30'},
+    {ico:'ðŸ””',txt:'Alerta enviada a <strong>DroguerÃ­a La Salud</strong>',t:'Ayer 08:00'},
+  ];
+  document.getElementById('actFeed').innerHTML=`<div class="act-feed">${acts.map(a=>`<div class="act-item"><div class="ai-ico">${a.ico}</div><div><div class="ai-txt">${a.txt}</div><div class="ai-time">${a.t}</div></div></div>`).join('')}</div>`;
+}
+
+// â”€â”€ NEGOCIOS TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function setFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderNegocios();
+}
+
+function renderNegocios(){
+  const q=(document.getElementById('qNegocios')?.value||'').toLowerCase();
+  let rows=data;
+  if(curFilter!=='todos') rows=rows.filter(n=>n.est===curFilter);
+  if(q) rows=rows.filter(n=>n.nombre.toLowerCase().includes(q)||n.loc.toLowerCase().includes(q)||n.cat.toLowerCase().includes(q)||n.email.toLowerCase().includes(q));
+  const em=document.getElementById('emNegocios'), tb=document.getElementById('bNegocios');
+  if(!rows.length){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=rows.map(n=>`<tr>
+    <td><div class="tn">${n.nombre}</div><div class="tm">${n.email}</div></td>
+    <td class="tm">${n.cat}</td>
+    <td class="tm">${n.loc}</td>
+    <td class="tmo">${n.plan}</td>
+    <td><span class="badge ${SC[n.est]}" style="font-size:.63rem">${SL[n.est]}</span></td>
+    <td class="tm">${fd(n.vence)}</td>
+    <td><div class="tact">
+      <button class="ab" onclick="openDetail(${n.id})">Ver</button>
+      ${n.est==='pendiente'?`<button class="ab suc" onclick="aprobar(${n.id})">âœ“ Aprobar</button>`:''}
+      ${n.est==='activo'?`<button class="ab" onclick="alertar(${n.id})">ðŸ””</button>`:''}
+      <button class="ab dan" onclick="borrar(${n.id})">âœ•</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// â”€â”€ SUSCRIPCIONES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderPendientes(){
+  const pen=data.filter(n=>n.est==='pendiente');
+  const em=document.getElementById('emPend'),tb=document.getElementById('bPendientes');
+  if(!pen.length){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=pen.map(n=>`<tr>
+    <td><div class="tn">${n.nombre}</div><div class="tm">${n.email}</div></td>
+    <td class="tmo">${n.plan}</td>
+    <td style="font-weight:600;color:var(--gold-light)">$${n.val.toLocaleString('es-CO')}</td>
+    <td class="tm">${n.medio}</td>
+    <td class="tm">${fd(n.ini)}</td>
+    <td><div class="tact">
+      <button class="ab suc" onclick="aprobar(${n.id})">âœ“ Aprobar</button>
+      <button class="ab dan" onclick="rechazar(${n.id})">âœ• Rechazar</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderHistorial(){
+  const act=data.filter(n=>n.est==='activo');
+  document.getElementById('bHistorial').innerHTML=act.map(n=>`<tr>
+    <td class="tn">${n.nombre}</td><td class="tmo">${n.plan}</td>
+    <td style="color:var(--gold-light)">$${n.val.toLocaleString('es-CO')}</td>
+    <td class="tm">${fd(n.ini)}</td><td class="tm">${fd(n.vence)}</td>
+    <td><span class="badge s-act" style="font-size:.63rem">Activo</span></td>
+  </tr>`).join('');
+}
+
+function aprobar(id){
+  const n=data.find(x=>x.id===id); if(!n) return;
+  n.est='activo';
+  showToast(`âœ… ${n.nombre} activada correctamente.`,'success',4000);
+  loadKPIs(); renderNegocios(); renderPendientes(); renderHistorial();
+}
+function rechazar(id){
+  const n=data.find(x=>x.id===id); if(!n||!confirm(`Â¿Rechazar pago de ${n.nombre}?`)) return;
+  showToast(`Pago de ${n.nombre} rechazado.`,'error',4000);
+}
+function borrar(id){
+  if(!confirm('Â¿Eliminar permanentemente este negocio?')) return;
+  data=data.filter(x=>x.id!==id);
+  showToast('Negocio eliminado.','info');
+  loadKPIs(); renderNegocios(); renderPendientes(); renderHistorial();
+}
+function alertar(id){
+  const n=data.find(x=>x.id===id); if(!n) return;
+  showToast(`ðŸ”” Alerta enviada a ${n.nombre} (${n.email})`,'success',4000);
+}
+
+// â”€â”€ DETAIL PANEL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openDetail(id){
+  const n=data.find(x=>x.id===id); if(!n) return;
+  const slug=slugify(n.nombre), link=`negocio.html?empresa=${slug}`;
+  document.getElementById('detailPanel').innerHTML=`
+    <div class="dp-hd"><h3>${n.nombre}</h3><button class="dp-cl" onclick="closeDetail()">âœ•</button></div>
+    <span class="badge ${SC[n.est]}" style="font-size:.68rem">${SL[n.est]}</span>
+    <div class="dp-div"></div>
+    <div class="dp-grid">
+      <div class="dp-field"><div class="dp-key">CategorÃ­a</div><div class="dp-val">${n.cat}</div></div>
+      <div class="dp-field"><div class="dp-key">Localidad</div><div class="dp-val">${n.loc}</div></div>
+      <div class="dp-field"><div class="dp-key">Correo</div><div class="dp-val" style="word-break:break-all">${n.email}</div></div>
+      <div class="dp-field"><div class="dp-key">Plan</div><div class="dp-val">${n.plan}</div></div>
+      <div class="dp-field"><div class="dp-key">ActivaciÃ³n</div><div class="dp-val">${fd(n.ini)}</div></div>
+      <div class="dp-field"><div class="dp-key">Vencimiento</div><div class="dp-val">${fd(n.vence)}</div></div>
+      <div class="dp-field"><div class="dp-key">Valor</div><div class="dp-val">${n.val?'$'+n.val.toLocaleString('es-CO'):'â€”'}</div></div>
+      <div class="dp-field"><div class="dp-key">Medio de pago</div><div class="dp-val">${n.medio||'â€”'}</div></div>
+      <div class="dp-field"><div class="dp-key">ImÃ¡genes</div><div class="dp-val">${n.fotos} / 10</div></div>
+      <div class="dp-field"><div class="dp-key">Promociones</div><div class="dp-val">${n.promos} / 4</div></div>
+    </div>
+    <div class="dp-div"></div>
+    <div class="dp-field">
+      <div class="dp-key">Enlace pÃºblico del negocio</div>
+      <div style="background:var(--dark-3);border:1px solid rgba(201,168,76,.25);border-radius:9px;padding:11px 14px;margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span style="flex:1;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);word-break:break-all;line-height:1.5">${link}</span>
+        <button onclick="navigator.clipboard.writeText('${link}').then(()=>showToast('Copiado âœ“','success'))" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--gold);cursor:pointer;padding:5px 10px;font-size:.7rem;font-weight:600;transition:background .15s;white-space:nowrap" onmouseover="this.style.background='rgba(201,168,76,.1)'" onmouseout="this.style.background='none'">Copiar</button>
+      </div>
+    </div>
+    <div class="dp-div"></div>
+    <div class="dp-acts">
+      ${n.est==='pendiente'?`<button class="btn btn-gold btn-sm" onclick="aprobar(${n.id});closeDetail()">âœ“ Aprobar pago y activar</button>`:''}
+      <button class="btn btn-outline btn-sm" onclick="alertar(${n.id})">ðŸ”” Enviar alerta de vencimiento</button>
+      <a href="${link}" target="_blank" class="btn btn-outline btn-sm">ðŸŒ Ver pÃ¡gina pÃºblica</a>
+      <button class="btn btn-danger btn-sm" onclick="if(confirm('Â¿Eliminar?')){borrar(${n.id});closeDetail()}">Eliminar negocio</button>
+    </div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailModal').classList.remove('open');}
+document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeDetail();});
+
+// â”€â”€ USUARIOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderUsuarios(){
+  const q=(document.getElementById('qUsuarios')?.value||'').toLowerCase();
+  const rows=data.filter(n=>!q||n.email.toLowerCase().includes(q)||n.nombre.toLowerCase().includes(q));
+  document.getElementById('bUsuarios').innerHTML=rows.map(n=>`<tr>
+    <td><div class="tn">${n.email}</div></td>
+    <td>${n.nombre}</td>
+    <td class="tm">${fd(n.ini)}</td>
+    <td><span class="badge ${SC[n.est]}" style="font-size:.63rem">${SL[n.est]}</span></td>
+    <td><div class="tact">
+      <button class="ab" onclick="openDetail(${n.id})">Ver negocio</button>
+      <button class="ab dan" onclick="showToast('Acceso suspendido temporalmente.','info')">Suspender</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// â”€â”€ PROMOCIONES ADMIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderPromos(){
+  const promos=[];
+  data.forEach(n=>{for(let i=0;i<n.promos;i++)promos.push({neg:n.nombre,titulo:`PromociÃ³n ${i+1}`,fecha:fd(n.ini),id:n.id});});
+  const em=document.getElementById('emPromos'),tb=document.getElementById('bPromos');
+  if(!promos.length){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=promos.map(p=>`<tr>
+    <td class="tn">${p.neg}</td><td>${p.titulo}</td><td class="tm">${p.fecha}</td>
+    <td><span class="badge badge-green" style="font-size:.63rem">Publicada</span></td>
+    <td><button class="ab dan" onclick="showToast('PromociÃ³n despublicada.','info')">Despublicar</button></td>
+  </tr>`).join('');
+}
+
+// â”€â”€ CÃ“DIGOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderCodigos(){
+  document.getElementById('bCodigos').innerHTML=codes.map((c,i)=>`<tr>
+    <td class="tmo">${c.code}</td><td>${c.dias} dÃ­as</td><td class="tm">${c.gen}</td>
+    <td class="tm">${c.uso}</td>
+    <td><span class="badge ${c.est==='usado'?'badge-muted':'badge-green'}" style="font-size:.63rem">${c.est==='usado'?'Usado':'Disponible'}</span></td>
+    <td><div class="tact">
+      ${c.est!=='usado'?`<button class="ab pri" onclick="copyCodigo('${c.code}')">Copiar</button>`:''}
+      <button class="ab dan" onclick="codes.splice(${i},1);renderCodigos();showToast('Eliminado.','info')">âœ•</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function genCodigo(){
+  const ch='ABCDEFGHJKLMNPRSTUVWXYZ23456789';
+  const code=Array.from({length:8},()=>ch[Math.floor(Math.random()*ch.length)]).join('');
+  codes.unshift({code,dias:30,gen:new Date().toISOString().split('T')[0],uso:'â€”',est:'activo'});
+  renderCodigos();
+  copyCodigo(code);
+  showToast(`CÃ³digo generado: ${code}  âœ“ copiado`,'success',5000);
+}
+
+function copyCodigo(code){
+  navigator.clipboard.writeText(code).catch(()=>{});
+}
+
+// â”€â”€ REPORTES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function loadReportes(){
+  const ing=data.filter(n=>n.est==='activo').reduce((a,n)=>a+n.val,0);
+  const grat=data.filter(n=>n.est==='gratis').length;
+  const conv=data.length?Math.round((1-grat/data.length)*100):0;
+  const vp=data.filter(n=>du(n.vence)<=5&&du(n.vence)>=0).length;
+  if(document.getElementById('r-ing')){
+    document.getElementById('r-ing').textContent='$'+ing.toLocaleString('es-CO');
+    document.getElementById('r-proy').textContent='$'+Math.round(ing*1.15).toLocaleString('es-CO');
+    document.getElementById('r-conv').textContent=conv+'%';
+    document.getElementById('r-venc').textContent=vp;
+  }
+}
+
+function renderVenc(){
+  const rows=data.filter(n=>n.est==='activo').map(n=>({...n,d:du(n.vence)})).filter(n=>n.d<=30).sort((a,b)=>a.d-b.d);
+  document.getElementById('bVenc').innerHTML=rows.length
+    ?rows.map(n=>`<tr>
+        <td class="tn">${n.nombre}</td><td class="tmo">${n.plan}</td>
+        <td class="tm">${fd(n.vence)}</td>
+        <td><span style="color:${n.d<=5?'#E55':n.d<=10?'#FFC107':'#2ECC71'};font-weight:700">${n.d} dÃ­as</span></td>
+        <td><button class="ab suc" onclick="alertar(${n.id})">ðŸ”” Alertar</button></td>
+      </tr>`).join('')
+    :'<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:28px">Sin vencimientos prÃ³ximos.</td></tr>';
+}
+
+// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function fd(d){if(!d)return'â€”';const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;}
+function du(d){const diff=new Date(d)-new Date();return Math.ceil(diff/(1000*60*60*24));}
+function slugify(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');}
+function exportCSV(){
+  const h='Nombre,Email,CategorÃ­a,Localidad,Plan,Estado,Vence,Valor\n';
+  const r=data.map(n=>`"${n.nombre}","${n.email}","${n.cat}","${n.loc}","${n.plan}","${n.est}","${n.vence}","${n.val}"`).join('\n');
+  const b=new Blob([h+r],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='negocios.csv';a.click();
+  showToast('CSV exportado âœ“','success');
+}
+</script>
+  <script src="js/api-client.js"></script>
+  <script src="js/integration.js"></script>
+</body>
+</html>
+

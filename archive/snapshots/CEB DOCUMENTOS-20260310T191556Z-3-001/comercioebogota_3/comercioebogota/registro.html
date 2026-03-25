@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro â€” Comercio e-BogotÃ¡</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body { background: var(--dark); }
+    .page-wrap { padding-top: 68px; min-height: 100vh; display: flex; }
+
+    /* Left panel */
+    .reg-aside {
+      width: 380px; flex-shrink: 0;
+      background: var(--dark-2);
+      border-right: 1px solid var(--border);
+      padding: 56px 40px;
+      display: flex; flex-direction: column;
+      position: sticky; top: 68px; height: calc(100vh - 68px); overflow-y: auto;
+    }
+    .reg-aside-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; margin-bottom: 10px; line-height: 1.2; }
+    .reg-aside-title em { font-style: italic; color: var(--gold-light); }
+    .reg-aside p { font-size: .875rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 32px; }
+    .aside-features { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .aside-features li { display: flex; align-items: flex-start; gap: 12px; font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
+    .aside-features li .ico { width: 30px; height: 30px; border-radius: 8px; background: rgba(201,168,76,.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: .9rem; margin-top: 2px; }
+    .aside-login { margin-top: auto; padding-top: 32px; border-top: 1px solid var(--border); font-size: .85rem; color: var(--text-muted); }
+    .aside-login a { color: var(--gold); text-decoration: none; font-weight: 600; }
+    .aside-login a:hover { color: var(--gold-light); }
+
+    /* Main form */
+    .reg-main { flex: 1; padding: 48px 5%; overflow-y: auto; }
+    .reg-form-card { max-width: 700px; }
+
+    .form-section { margin-bottom: 40px; }
+    .form-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 600;
+      color: var(--text); margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .form-section-title .num { font-family: 'DM Mono', monospace; font-size: .75rem; color: var(--gold); background: rgba(201,168,76,.1); border: 1px solid var(--border); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-row.full { grid-template-columns: 1fr; }
+
+    /* Logo upload */
+    .logo-upload-zone {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      border: 2px dashed var(--gold-dim);
+      background: var(--dark-3);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color .2s, background .2s;
+      flex-shrink: 0;
+    }
+    .logo-upload-zone:hover { border-color: var(--gold); background: rgba(201,168,76,.06); }
+    .logo-upload-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; display: none; }
+    .logo-upload-zone.has-image img { display: block; }
+    .logo-upload-zone.has-image .logo-overlay { opacity: 0; }
+    .logo-upload-zone:hover .logo-overlay { opacity: 1 !important; }
+    .logo-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.6); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: opacity .2s; z-index: 1; }
+    .logo-overlay svg { width: 22px; height: 22px; stroke: var(--gold); }
+    .logo-overlay span { font-size: .65rem; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; }
+    .logo-hint { font-size: .78rem; color: var(--text-muted); line-height: 1.6; flex: 1; }
+    .logo-hint strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+    /* Password strength */
+    .pw-strength { height: 3px; background: var(--dark-4); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .pw-bar { height: 100%; width: 0%; border-radius: 2px; transition: width .3s, background .3s; }
+
+    /* Promo code field */
+    .promo-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .85rem; color: var(--text-muted); user-select: none; margin-bottom: 0; }
+    .promo-toggle input[type=checkbox] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
+    .promo-field { display: none; margin-top: 14px; }
+    .promo-field.show { display: block; }
+
+    /* Terms */
+    .terms-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+    .terms-check input { accent-color: var(--gold); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    .terms-check span { font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
+    .terms-check a { color: var(--gold); text-decoration: none; }
+
+    /* Success state */
+    .reg-success {
+      display: none;
+      text-align: center; padding: 60px 40px;
+      border: 1px solid rgba(46,204,113,.2);
+      border-radius: var(--radius-lg);
+      background: rgba(46,204,113,.04);
+    }
+    .reg-success .success-icon { font-size: 3rem; margin-bottom: 20px; }
+    .reg-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 12px; }
+    .reg-success h3 em { font-style: italic; color: var(--gold-light); }
+    .reg-success p { color: var(--text-muted); margin-bottom: 28px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+    /* Recovery tabs */
+    .recover-section { display: none; }
+    .recover-section.show { display: block; }
+    .recover-tabs { display: flex; gap: 0; margin-bottom: 28px; background: var(--dark-3); border-radius: 8px; padding: 4px; }
+    .recover-tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; font-size: .8rem; font-weight: 500; color: var(--text-muted); transition: all .2s; }
+    .recover-tab.active { background: var(--dark-4); color: var(--gold); }
+
+    @media (max-width: 900px) { .reg-aside { display: none; } }
+    @media (max-width: 620px) { .form-row { grid-template-columns: 1fr; } .form-row.triple { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="main-nav">
+  <a href="index.html" class="nav-logo">
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" stroke="#C9A84C" stroke-width="2.5"/><path d="M18 40 Q40 14 62 40" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M20 41 Q40 66 60 41" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="40" cy="40" r="3.5" fill="#C9A84C"/></svg>
+    <span class="nav-brand">Comercio <em>eÂ·BogotÃ¡</em></span>
+  </a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="panel.html" class="nav-btn">Ya soy cliente</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <!-- ASIDE -->
+  <aside class="reg-aside">
+    <div class="eyebrow" style="margin-bottom:20px">Nuevo registro</div>
+    <h2 class="reg-aside-title">Empieza a <em>brillar</em><br>en internet hoy</h2>
+    <p>Crea tu cuenta y obtÃ©n 30 dÃ­as de prueba gratuita para que miles de clientes en BogotÃ¡ encuentren tu negocio.</p>
+    <ul class="aside-features">
+      <li><div class="ico">âœ“</div><div>Sin tarjeta de crÃ©dito para el perÃ­odo de prueba</div></li>
+      <li><div class="ico">ðŸŒ</div><div>PÃ¡gina web propia con URL amigable personalizada</div></li>
+      <li><div class="ico">ðŸ“·</div><div>Sube hasta 10 imÃ¡genes de tus productos o servicios</div></li>
+      <li><div class="ico">ðŸ“£</div><div>4 promociones semanales en la plataforma</div></li>
+      <li><div class="ico">ðŸ“</div><div>GeolocalizaciÃ³n por localidad y categorÃ­a en BogotÃ¡</div></li>
+      <li><div class="ico">ðŸ””</div><div>ActivaciÃ³n en menos de 2 horas tras el registro</div></li>
+    </ul>
+    <div class="aside-login">
+      Â¿Ya tienes cuenta? <a href="panel.html">Ingresa aquÃ­ â†’</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="reg-main">
+    <div class="reg-form-card">
+
+      <!-- REGISTRO FORM -->
+      <div id="registroForm">
+        <div class="eyebrow" style="margin-bottom:8px">Paso 1 de 1</div>
+        <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;margin-bottom:6px">Crear tu cuenta</h1>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:36px">Todos los campos marcados con <span style="color:var(--red)">*</span> son obligatorios.</p>
+
+        <form id="mainForm" novalidate>
+
+          <!-- SECCIÃ“N 1: Datos personales -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="num">1</span> Datos personales</div>
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group">
+                <label class="form-label">Nombre completo <span>*</span></label>
+                <input type="text" class="form-input" name="nombre" placeholder="Pedro PÃ©rez" required autocomplete="name" />
+                <span class="form-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">TelÃ©fono / Celular <span>*</span></label>
+                <input type="tel" class="form-input" name="telefono" placeholder="3XX XXX XXXX" required />
+                <span class="form-error"></span>
+              </div>
+            </div>
+            <div class="form-row full">
+              <div class="form-group">
+                <label class="form-label">Correo electrÃ³nico <span>*</span> <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;font-family:'DM Sans',sans-serif;font-size:.75rem">(serÃ¡ tu usuario de acceso)</span></label>
+                <input type="email" class="form-input" name="email" placeholder="tucorreo@ejemplo.com" required autocomplete="email" />
+                <span class="form-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÃ“N 2: Datos del negocio -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="num">2</span> Datos del negocio</div>
+
+            <!-- Logo upload -->
+            <div style="display:flex;align-items:flex-start;gap:24px;margin-bottom:20px">
+              <div>
+                <div class="form-label" style="margin-bottom:8px">Logo / Imagen principal</div>
+                <div class="logo-upload-zone" id="logoZone" title="Clic para cargar logo">
+                  <img id="logoPreview" src="" alt="Logo preview" />
+                  <div class="logo-overlay">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Cargar</span>
+                  </div>
+                </div>
+                <input type="file" id="logoInput" accept="image/*" style="display:none" />
+                <div style="font-size:.7rem;color:var(--text-muted);margin-top:6px;text-align:center">JPG / PNG<br>MÃ¡x. 2MB</div>
+              </div>
+              <div class="logo-hint">
+                <strong>Imagen principal del negocio</strong>
+                Esta imagen aparecerÃ¡ como logo en tu pÃ¡gina de negocio dentro de la plataforma. Recomendamos imagen cuadrada de al menos 300Ã—300 px en formato JPG o PNG. Puedes cambiarla en cualquier momento desde el panel de cliente.
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group">
+                <label class="form-label">Nombre del negocio <span>*</span></label>
+                <input type="text" class="form-input" name="negocio" placeholder="Mi Empresa S.A.S." required />
+                <span class="form-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">CategorÃ­a <span>*</span></label>
+                <select class="form-select" name="categoria" required>
+                  <option value="">Selecciona una categorÃ­a...</option>
+                  <option>Almacenes de calzado</option><option>Almacenes de ropa</option><option>Autolavados</option>
+                  <option>BarberÃ­as</option><option>BicicleterÃ­as</option><option>CarnicerÃ­as</option>
+                  <option>CerrajerÃ­as</option><option>DroguerÃ­as</option><option>ElectrÃ³nica y tecnologÃ­a</option>
+                  <option>FerreterÃ­as</option><option>FloristerÃ­as</option><option>FruterÃ­as y verduras</option>
+                  <option>HeladerÃ­as y postres</option><option>LavanderÃ­as</option><option>LicorerÃ­as</option>
+                  <option>MiscelÃ¡neas</option><option>PanaderÃ­as</option><option>PapelerÃ­as</option>
+                  <option>PeluquerÃ­as y estÃ©tica</option><option>Restaurantes</option><option>Salas de belleza</option>
+                  <option>Servicios domiciliarios</option><option>Talleres mecÃ¡nicos</option><option>Veterinarias</option>
+                  <option>Otro</option>
+                </select>
+                <span class="form-error"></span>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:16px">
+              <div class="form-group">
+                <label class="form-label">DirecciÃ³n <span>*</span></label>
+                <input type="text" class="form-input" name="direccion" placeholder="Cll 21 32 95" required />
+                <span class="form-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Localidad <span>*</span></label>
+                <select class="form-select" name="localidad" required>
+                  <option value="">Selecciona la localidad...</option>
+                  <option>Antonio NariÃ±o</option><option>Barrios Unidos</option><option>Bosa</option>
+                  <option>Chapinero</option><option>Ciudad BolÃ­var</option><option>EngativÃ¡</option>
+                  <option>FontibÃ³n</option><option>Kennedy</option><option>La Candelaria</option>
+                  <option>Los MÃ¡rtires</option><option>Puente Aranda</option><option>Rafael Uribe Uribe</option>
+                  <option>San CristÃ³bal</option><option>Santa Fe</option><option>Suba</option>
+                  <option>Sumapaz</option><option>Teusaquillo</option><option>Tunjuelito</option>
+                  <option>UsaquÃ©n</option><option>Usme</option>
+                </select>
+                <span class="form-error"></span>
+              </div>
+            </div>
+
+            <div class="form-row full">
+              <div class="form-group">
+                <label class="form-label">Â¿QuÃ© hace su negocio? <span>*</span></label>
+                <textarea class="form-textarea form-input" name="descripcion" placeholder="Describa brevemente los productos o servicios que ofrece su negocio. Este campo es importante para que aparezca en las bÃºsquedas de la plataforma." required style="min-height:80px"></textarea>
+                <span class="form-hint">Este campo aparecerÃ¡ en la bÃºsqueda de la plataforma. Sea claro y conciso.</span>
+                <span class="form-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÃ“N 3: ContraseÃ±a -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="num">3</span> ContraseÃ±a de acceso</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">ContraseÃ±a <span>*</span></label>
+                <input type="password" class="form-input" name="password" id="pwField" placeholder="MÃ­nimo 8 caracteres" required data-minlen="8" autocomplete="new-password" />
+                <div class="pw-strength"><div class="pw-bar" id="pwBar"></div></div>
+                <span class="form-hint" id="pwHint">Usa letras, nÃºmeros y sÃ­mbolos para mayor seguridad.</span>
+                <span class="form-error"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirmar contraseÃ±a <span>*</span></label>
+                <input type="password" class="form-input" name="confirm_password" placeholder="Repite la contraseÃ±a" required autocomplete="new-password" />
+                <span class="form-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÃ“N 4: CÃ³digo promocional (opcional) -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="num">4</span> CÃ³digo promocional <span style="font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:400;color:var(--text-muted);margin-left:6px">(opcional)</span></div>
+            <label class="promo-toggle">
+              <input type="checkbox" id="promoCheck" />
+              <span>Tengo un cÃ³digo promocional</span>
+            </label>
+            <div class="promo-field" id="promoField">
+              <div class="form-group">
+                <label class="form-label">CÃ³digo promocional</label>
+                <input type="text" class="form-input" name="codigo_promocional" placeholder="XXXXXXXX" style="text-transform:uppercase;letter-spacing:.12em;font-family:'DM Mono',monospace" />
+                <span class="form-hint">SolÃ­citalo por WhatsApp desde la pÃ¡gina principal. Otorga 30 dÃ­as de prueba gratuita.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TÃ©rminos -->
+          <div style="margin-bottom:28px">
+            <label class="terms-check">
+              <input type="checkbox" id="termsCheck" required />
+              <span>Acepto los <a href="#">TÃ©rminos de uso</a> y la <a href="#">PolÃ­tica de privacidad</a> de Comercio e-BogotÃ¡. Entiendo que mis datos serÃ¡n usados para gestionar mi cuenta y visibilidad en la plataforma.</span>
+            </label>
+            <span class="form-error" id="termsError" style="display:none;color:var(--red);font-size:.78rem;margin-top:6px"></span>
+          </div>
+
+          <button type="submit" class="btn btn-gold btn-lg btn-full" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Crear mi cuenta gratis
+          </button>
+        </form>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="reg-success" id="regSuccess">
+        <div class="success-icon">âœ‰ï¸</div>
+        <h3>Â¡Registro <em>exitoso</em>!</h3>
+        <p>Hemos enviado un correo de confirmaciÃ³n a <strong id="successEmail"></strong>. Revisa tu bandeja de entrada y haz clic en <strong>"Confirmar correo"</strong> para activar tu cuenta.</p>
+        <div class="alert alert-info" style="text-align:left;margin-bottom:24px">
+          <span>â„¹ï¸</span>
+          <div>Si tienes un <strong>cÃ³digo promocional</strong>, podrÃ¡s ingresarlo desde tu Panel â†’ MI CUENTA â†’ CÃ“DIGO PROMOCIONAL una vez confirmes tu correo.</div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="panel.html" class="btn btn-gold">Ir a mi panel â†’</a>
+          <a href="index.html" class="btn btn-outline">Volver al inicio</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<a href="#" class="whatsapp-fab"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.372 0 12c0 2.116.553 4.103 1.522 5.83L.044 23.95l6.263-1.643A11.954 11.954 0 0012 24c6.628 0 12-5.372 12-12S18.627 0 12 0z"/></svg></a>
+
+<script src="js/app.js"></script>
+<script>
+const logoZone = document.getElementById('logoZone');
+const logoInput = document.getElementById('logoInput');
+const logoPreview = document.getElementById('logoPreview');
+
+logoZone.addEventListener('click', () => logoInput.click());
+logoZone.addEventListener('dragover', e => { e.preventDefault(); logoZone.style.borderColor = 'var(--gold)'; });
+logoZone.addEventListener('dragleave', () => { logoZone.style.borderColor = ''; });
+logoZone.addEventListener('drop', e => {
+  e.preventDefault(); logoZone.style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file) handleLogoFile(file);
+});
+logoInput.addEventListener('change', () => { if (logoInput.files[0]) handleLogoFile(logoInput.files[0]); });
+
+function handleLogoFile(file) {
+  if (!file.type.startsWith('image/')) { showToast('Solo se aceptan imÃ¡genes JPG o PNG.', 'error'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('La imagen supera el lÃ­mite de 2MB.', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    logoPreview.src = e.target.result;
+    logoZone.classList.add('has-image');
+    showToast('Logo cargado correctamente âœ“', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Password strength
+document.getElementById('pwField').addEventListener('input', function() {
+  const v = this.value;
+  const bar = document.getElementById('pwBar');
+  const hint = document.getElementById('pwHint');
+  let score = 0;
+  if (v.length >= 8) score++;
+  if (/[A-Z]/.test(v)) score++;
+  if (/[0-9]/.test(v)) score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const colors = ['', '#E55', '#E5A020', '#C9A84C', '#2ECC71'];
+  const labels = ['', 'Muy dÃ©bil', 'DÃ©bil', 'Regular', 'Segura'];
+  bar.style.width = (score * 25) + '%';
+  bar.style.background = colors[score] || 'transparent';
+  hint.textContent = score > 0 ? `ContraseÃ±a: ${labels[score]}` : 'Usa letras, nÃºmeros y sÃ­mbolos para mayor seguridad.';
+  hint.style.color = colors[score] || '';
+});
+
+// Promo toggle
+document.getElementById('promoCheck').addEventListener('change', function() {
+  document.getElementById('promoField').classList.toggle('show', this.checked);
+});
+
+// Real-time validation
+document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(el => {
+  el.addEventListener('blur', () => validateField(el));
+});
+
+// Form submit
+document.getElementById('mainForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const terms = document.getElementById('termsCheck');
+  const termsErr = document.getElementById('termsError');
+
+  let valid = validateForm(this);
+
+  if (!terms.checked) {
+    termsErr.textContent = 'Debes aceptar los tÃ©rminos y condiciones.';
+    termsErr.style.display = 'block';
+    valid = false;
+  } else {
+    termsErr.style.display = 'none';
+  }
+
+  if (!valid) {
+    showToast('Por favor, revisa los campos marcados en rojo.', 'error');
+    const firstError = this.querySelector('.has-error');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Procesando...';
+
+  // Simulate registration
+  setTimeout(() => {
+    const email = this.querySelector('[name="email"]').value;
+    const nombre = this.querySelector('[name="negocio"]').value;
+    Store.set('user', { email, nombre, plan: 'GRATIS', loggedIn: false });
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('registroForm').style.display = 'none';
+    document.getElementById('regSuccess').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 1500);
+});
+</script>
+  <script src="js/api-client.js"></script>
+  <script src="js/integration.js"></script>
+</body>
+</html>
+

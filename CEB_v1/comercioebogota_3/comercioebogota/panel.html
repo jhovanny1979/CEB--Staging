@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Panel Cliente — Comercio e-Bogotá</title>
+  <script>
+    if (location.protocol === 'file:') {
+      const page = location.pathname.split('/').pop() || 'index.html';
+      const storedHost = localStorage.getItem('ceb_front_host') || '127.0.0.1';
+      const target = 'http://' + storedHost + ':5500/' + page + location.search + location.hash;
+      location.replace(target);
+    }
+  </script>
+
+  <link rel="stylesheet" href="css/styles.css?v=20260320fix9" />
+  <style>
+    body { background: var(--dark); }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 100px 20px 40px;
+    }
+    .login-box {
+      width: 100%; max-width: 440px;
+      background: var(--dark-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 44px 40px;
+    }
+    .login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; justify-content: center; }
+    .login-title { font-family: var(--font-main); font-size: 1.8rem; font-weight: 400; text-align: center; margin-bottom: 6px; }
+    .login-sub { color: var(--text-muted); font-size: .875rem; text-align: center; margin-bottom: 28px; }
+    .login-form { display: flex; flex-direction: column; gap: 16px; }
+    .recover-link { font-size: .8rem; color: var(--gold); text-decoration: none; cursor: pointer; }
+    .recover-link:hover { color: var(--gold-light); }
+
+    /* Recovery modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 800;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px; width: 100%; max-width: 420px;
+      position: relative;
+    }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 4px 8px; border-radius: 6px; transition: background .2s; }
+    .modal-close:hover { background: var(--dark-3); color: var(--text); }
+    .modal h3 { font-family: var(--font-main); font-size: 1.5rem; margin-bottom: 8px; }
+    .modal p { font-size: .85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .rec-tabs { display: flex; gap: 0; background: var(--dark-3); border-radius: 8px; padding: 3px; margin-bottom: 20px; }
+    .rec-tab { flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px; cursor: pointer; font-size: .78rem; font-weight: 500; color: var(--text-muted); transition: all .2s; }
+    .rec-tab.active { background: var(--dark-4); color: var(--gold); }
+
+    /* ── PANEL LAYOUT ── */
+    #panelScreen { display: none; padding-top: 68px; }
+    .panel-layout { display: flex; min-height: calc(100vh - 68px); }
+
+    /* Sidebar */
+    .panel-sidebar {
+      width: 240px; flex-shrink: 0;
+      background: var(--dark-2); border-right: 1px solid var(--border);
+      position: sticky; top: 68px; height: calc(100vh - 68px);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-user {
+      padding: 24px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sidebar-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(125,201,0,.15); border: 1px solid var(--gold-dim);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .sidebar-avatar img.show { display: block; }
+    .sidebar-avatar .av-icon { font-size: 1.1rem; }
+    .sidebar-name { font-weight: 600; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-plan { font-size: .72rem; color: var(--gold); font-family: var(--font-main); }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; text-decoration: none;
+      font-size: .875rem; color: var(--text-muted);
+      transition: background .2s, color .2s;
+    }
+    .sidebar-link:hover { background: var(--dark-3); color: var(--text); }
+    .sidebar-link.active { background: rgba(125,201,0,.1); color: var(--gold); border: 1px solid rgba(125,201,0,.15); }
+    .sidebar-link .link-icon {
+      width: 20px; height: 20px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .sidebar-link .link-icon svg {
+      width: 16px; height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sidebar-sep { height: 1px; background: var(--border); margin: 8px 0; }
+    .sidebar-logout { margin: 12px; }
+
+    /* Panel content */
+    .panel-content { flex: 1; padding: 40px 5%; overflow-y: auto; }
+
+    /* Section visibility */
+    .panel-section { display: none; }
+    .panel-section.active { display: block; }
+
+    .panel-heading { margin-bottom: 32px; }
+    .panel-heading h2 { font-family: var(--font-main); font-size: 2rem; font-weight: 400; }
+    .panel-heading p { color: var(--text-muted); font-size: .875rem; margin-top: 6px; }
+
+    /* ── MI CUENTA ── */
+    .subs-card {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px;
+      margin-bottom: 20px;
+    }
+    .subs-card h3 { font-family: var(--font-main); font-size: 1.3rem; font-weight: 600; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .subs-field { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.05); }
+    .subs-field:last-child { border-bottom: none; }
+    .subs-key { font-family: var(--font-main); font-size: .68rem; color: var(--gold); letter-spacing: .12em; text-transform: uppercase; }
+    .subs-val { font-size: .9rem; }
+    .subs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .subs-grid .subs-field { background: var(--dark-2); padding: 14px 16px; border-bottom: none; }
+
+    .act-subs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .plan-option {
+      border: 1px solid var(--border); border-radius: 10px; padding: 18px 16px;
+      cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .plan-option:hover { border-color: var(--gold-dim); }
+    .plan-option.selected { border-color: var(--gold); background: rgba(125,201,0,.05); }
+    .plan-option input[type=radio] { display: none; }
+    .po-tag { font-family: var(--font-main); font-size: .65rem; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+    .po-price { font-family: var(--font-main); font-size: 1.6rem; font-weight: 600; }
+    .po-price sup { font-size: .85rem; vertical-align: super; }
+    .po-price small { font-size: .8rem; color: var(--text-muted); font-family: var(--font-main); font-weight: 400; }
+    .po-total { font-size: .75rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* Payment proof upload */
+    .payment-proof {
+      border: 1.5px dashed var(--border); border-radius: 10px;
+      padding: 24px; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .payment-proof:hover { border-color: var(--gold-dim); background: rgba(125,201,0,.03); }
+    .payment-proof.has-file { border-color: var(--gold-dim); background: rgba(125,201,0,.04); }
+    .payment-proof .pf-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .payment-proof p { font-size: .85rem; color: var(--text-muted); }
+    .payment-proof strong { color: var(--text); }
+    .pf-preview { display: flex; align-items: center; gap: 12px; margin-top: 12px; text-align: left; }
+    .pf-thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); }
+    .pf-info { font-size: .8rem; color: var(--text-muted); }
+    .pf-info strong { color: var(--text); display: block; margin-bottom: 2px; }
+    #pfPreviewWrap { display: none; }
+
+    /* Promo code input */
+    .promo-code-box { display: flex; gap: 10px; }
+    .promo-code-box input { flex: 1; text-transform: uppercase; letter-spacing: .12em; font-family: var(--font-main); }
+
+    /* ── MI NEGOCIO ── */
+    .neg-logo-section {
+      display: flex; align-items: flex-start; gap: 28px; margin-bottom: 28px;
+      padding-bottom: 28px; border-bottom: 1px solid var(--border);
+    }
+    .neg-grid-basic { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .neg-grid-social { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .neg-logo-wrap { position: relative; flex-shrink: 0; }
+    .neg-logo-img {
+      width: 110px; height: 110px; border-radius: 50%;
+      object-fit: cover; display: block;
+      border: 2px solid var(--border); background: var(--dark-3);
+      cursor: pointer; transition: opacity .2s;
+    }
+    .neg-logo-img:hover { opacity: .8; }
+    .neg-logo-overlay {
+      position: absolute; bottom: 0; right: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--gold); color: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; pointer-events: none; font-size: .8rem;
+    }
+
+    /* Gallery upload */
+    .gallery-section { margin-top: 28px; }
+    .gallery-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .gallery-title { font-family: var(--font-main); font-size: 1.3rem; font-weight: 600; }
+    .gallery-count { font-family: var(--font-main); font-size: .72rem; color: var(--text-muted); }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+      margin-bottom: 16px;
+    }
+    .gallery-thumb {
+      aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+      position: relative; background: var(--dark-3);
+      border: 1px solid var(--border); cursor: default;
+    }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gallery-thumb .gt-actions {
+      position: absolute; inset: 0; background: rgba(0,0,0,.65);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      opacity: 0; transition: opacity .2s;
+    }
+    .gallery-thumb:hover .gt-actions { opacity: 1; }
+    .gt-btn {
+      width: 32px; height: 32px; border-radius: 7px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: white; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .9rem; transition: background .15s;
+    }
+    .gt-btn:hover { background: rgba(255,255,255,.25); }
+    .gt-btn.del:hover { background: rgba(229,85,85,.5); }
+    .gallery-add {
+      aspect-ratio: 1; border-radius: 8px;
+      border: 1.5px dashed var(--gold-dim); background: transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; cursor: pointer; font-size: .72rem; color: var(--gold);
+      letter-spacing: .08em; transition: background .2s, border-color .2s;
+    }
+    .gallery-add:hover { background: rgba(125,201,0,.06); border-color: var(--gold); }
+    .gallery-add .add-icon { font-size: 1.4rem; }
+    .gallery-note { font-size: .78rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* Days checkboxes */
+    .days-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .day-chip {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--dark-3); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      transition: all .15s; user-select: none;
+    }
+    .day-chip.on { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+    .hours-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .hours-row label { font-size: .82rem; color: var(--text-muted); }
+
+    /* ── PROMOCIONES ── */
+    .promo-list { display: flex; flex-direction: column; gap: 14px; }
+    .promo-item {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .promo-item.published { border-color: rgba(46,204,113,.2); }
+    .pi-thumb { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; background: var(--dark-3); border: 1px solid var(--border); flex-shrink: 0; }
+    .pi-body { flex: 1; min-width: 0; }
+    .pi-title { font-family: var(--font-main); font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .pi-meta { font-size: .78rem; color: var(--text-muted); margin-bottom: 8px; }
+    .pi-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* New promo form */
+    .promo-form-card {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px; margin-bottom: 28px;
+      display: none;
+    }
+    .promo-form-card.show { display: block; }
+    .rich-toolbar {
+      display: flex; gap: 4px; padding: 8px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: 8px 8px 0 0; border-bottom: none; flex-wrap: wrap;
+    }
+    .rtb { background: none; border: 1px solid transparent; border-radius: 5px; color: var(--text-muted); cursor: pointer; padding: 4px 8px; font-size: .82rem; font-weight: 600; transition: all .15s; }
+    .rtb:hover { background: var(--dark-4); color: var(--text); border-color: var(--border); }
+    .rich-editor {
+      min-height: 100px; padding: 12px 14px;
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: 0 0 8px 8px; color: var(--text);
+      font-family: var(--font-main); font-size: .9rem; line-height: 1.6;
+      outline: none;
+    }
+    .rich-editor:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; }
+    .promo-img-upload {
+      border: 1.5px dashed var(--border); border-radius: 10px; padding: 24px;
+      text-align: center; cursor: pointer; transition: all .2s; position: relative;
+      overflow: hidden;
+    }
+    .promo-img-upload:hover { border-color: var(--gold-dim); }
+    .promo-img-preview { max-height: 160px; max-width: 100%; border-radius: 8px; margin-top: 10px; display: none; }
+    .promo-img-name { font-size: .78rem; color: var(--text-muted); margin-top: 6px; display: none; }
+    .promo-images-list {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      text-align: left;
+    }
+    .promo-image-item {
+      background: var(--dark-3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .promo-image-item img {
+      width: 100%;
+      height: 110px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: var(--dark-4);
+    }
+    .promo-image-desc {
+      min-height: 62px;
+      resize: vertical;
+      font-size: .78rem;
+      line-height: 1.45;
+      padding: 8px 10px;
+    }
+    .promo-image-remove {
+      align-self: flex-start;
+    }
+
+    /* WhatsApp module */
+    .wa-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .wa-tab-btn {
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text-muted); cursor: pointer;
+      font-size: .82rem; font-weight: 600; padding: 10px 14px;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all .2s;
+    }
+    .wa-tab-btn:hover { color: var(--text); border-color: var(--gold-dim); }
+    .wa-tab-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(125,201,0,.08); }
+    .wa-tab-panel { display: none; }
+    .wa-tab-panel.active { display: block; }
+    .wa-card {
+      background: var(--dark-2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 22px; margin-bottom: 16px;
+    }
+    .wa-card h3 { font-family: var(--font-main); font-size: 1.1rem; margin-bottom: 6px; }
+    .wa-card p { color: var(--text-muted); font-size: .82rem; margin-bottom: 14px; line-height: 1.6; }
+    .wa-tip {
+      background: linear-gradient(135deg, rgba(125,201,0,.12), rgba(255,255,255,.01));
+      border: 1px solid rgba(125,201,0,.35);
+      border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+      font-size: .82rem; line-height: 1.65; color: var(--text-muted);
+    }
+    .wa-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .wa-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .wa-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .wa-search {
+      background: var(--dark-3); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); padding: 9px 12px; font-size: .84rem;
+      outline: none; min-width: 220px;
+    }
+    .wa-search:focus { border-color: var(--gold-dim); }
+    .wa-table-wrap { overflow-x: auto; }
+    .wa-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .wa-table th, .wa-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .wa-table th { color: var(--text-muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-family: var(--font-main); }
+    .wa-chip {
+      background: rgba(125,201,0,.11); color: var(--gold);
+      border: 1px solid rgba(125,201,0,.3); border-radius: 999px;
+      padding: 2px 10px; font-size: .72rem; display: inline-flex; align-items: center;
+    }
+    .wa-empty {
+      text-align: center; color: var(--text-muted); font-size: .84rem;
+      border: 1px dashed var(--border); border-radius: 10px; padding: 24px 12px;
+    }
+    .wa-emoji-list { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .wa-emoji-btn {
+      background: var(--dark-3); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; cursor: pointer; font-size: 1.1rem; padding: 8px 10px;
+      transition: all .15s;
+    }
+    .wa-emoji-btn.active { border-color: var(--gold); background: rgba(125,201,0,.13); transform: translateY(-1px); }
+    .wa-preview {
+      background: #121a20; border: 1px solid #1f2c34; border-radius: 12px; padding: 16px;
+      min-height: 180px;
+    }
+    .wa-bubble {
+      background: #1f2c34; border-radius: 10px 10px 10px 0;
+      padding: 10px 12px; display: inline-block; max-width: 96%;
+      color: #e6eaed; font-size: .82rem; white-space: pre-wrap; line-height: 1.6;
+    }
+    .wa-promo-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+    .wa-promo-card {
+      background: var(--dark-3); border: 1px solid var(--border); border-radius: 11px; padding: 14px;
+    }
+    .wa-promo-title { color: var(--text); font-weight: 700; margin: 8px 0 6px; font-size: .9rem; }
+    .wa-promo-msg { color: var(--text-muted); font-size: .8rem; line-height: 1.55; margin-bottom: 10px; }
+    .wa-upload {
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      background: var(--dark-3);
+    }
+    .wa-upload-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .wa-upload-name { color: var(--text-muted); font-size: .76rem; }
+    .wa-upload-preview {
+      margin-top: 10px;
+      max-width: 180px;
+      max-height: 120px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      display: none;
+      background: var(--dark-2);
+    }
+    .wa-promo-img {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      background: var(--dark-2);
+    }
+    .wa-send-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .wa-contact-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .wa-contact-pill {
+      background: var(--dark-3); border: 1px solid var(--border); border-radius: 9px;
+      padding: 8px 10px; display: inline-flex; align-items: center; gap: 8px;
+      font-size: .78rem; color: var(--text);
+    }
+    .wa-foot { color: var(--text-muted); font-size: .76rem; margin-top: 10px; }
+
+    @media (max-width:900px) {
+      .panel-sidebar { width: 56px; }
+      .sidebar-name, .sidebar-plan, .link-text { display: none; }
+      .sidebar-user { padding: 16px 8px; justify-content: center; }
+      .sidebar-nav { padding: 8px; }
+      .sidebar-link { justify-content: center; padding: 10px; }
+    }
+    @media (max-width:640px) {
+      .gallery-grid { grid-template-columns: repeat(3,1fr); }
+      .act-subs-grid { grid-template-columns: 1fr; }
+      .subs-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width:760px) {
+      .panel-layout { flex-direction: column; }
+      .panel-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+        z-index: 2;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar-user { padding: 10px 14px; justify-content: flex-start; }
+      .sidebar-name, .sidebar-plan, .link-text { display: block; }
+      .sidebar-nav {
+        flex: 0 0 auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        overflow: visible;
+        white-space: normal;
+        padding: 8px 10px 12px;
+      }
+      .sidebar-link {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-start;
+        padding: 10px 12px;
+        min-height: 42px;
+      }
+      .sidebar-sep { margin: 4px 0; }
+      .sidebar-logout { display: none; }
+      .panel-content { padding: 22px 4% 80px; }
+      .panel-heading h2 { font-size: 1.55rem; }
+      .neg-logo-section { flex-direction: column; gap: 14px; }
+      .neg-grid-basic,
+      .neg-grid-social { grid-template-columns: 1fr; }
+      .wa-grid-3, .wa-grid-2 { grid-template-columns: 1fr; }
+      .hours-row .form-input { width: 100% !important; max-width: 170px; }
+      .promo-code-box { flex-direction: column; }
+      .promo-item { flex-direction: column; }
+      .pi-thumb { width: 100%; height: 180px; }
+      #sec-cambiarPw .subs-card[style*='max-width:480px'] { max-width: 100% !important; }
+    }
+    @media (max-width:480px) {
+      .gallery-grid { grid-template-columns: repeat(2,1fr); }
+      .days-grid { gap: 6px; }
+      .day-chip { width: 36px; height: 36px; }
+    }
+    @media (max-width:420px) {
+      #loginScreen { padding: 88px 10px 20px; }
+      .login-box { padding: 24px 16px; }
+      .modal { padding: 22px 16px; }
+      .panel-content { padding: 16px 12px 74px; }
+      .panel-heading h2 { font-size: 1.35rem; }
+      .subs-card, .promo-form-card, .wa-card { padding: 16px; }
+      .wa-actions .btn, .pi-actions .btn { width: 100%; justify-content: center; }
+      .wa-search { min-width: 0; width: 100%; }
+      .wa-tabs { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .wa-tab-btn { width: 100%; justify-content: center; }
+      .sidebar-link { width: 100%; }
+    }
+    html.native-app #panelScreen { padding-top: var(--nav-offset); }
+    html.native-app .panel-layout { min-height: calc(100vh - var(--nav-offset)); }
+    html.native-app #loginScreen {
+      padding-top: calc(var(--nav-offset) + 26px);
+      padding-bottom: calc(var(--safe-bottom) + 20px);
+    }
+    @media (max-width:760px) {
+      html.native-app .panel-sidebar {
+        height: auto !important;
+        max-height: none;
+      }
+      html.native-app .panel-layout {
+        display: block;
+        min-height: auto;
+      }
+      html.native-app .panel-sidebar {
+        position: relative !important;
+        top: 0 !important;
+        width: 100% !important;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      html.native-app .sidebar-user {
+        padding: 10px 12px;
+      }
+      html.native-app .sidebar-nav {
+        padding: 6px 10px 10px;
+        gap: 4px;
+      }
+      html.native-app .sidebar-link {
+        min-height: 38px;
+        padding: 9px 10px;
+      }
+      html.native-app .panel-content {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 14px 12px calc(var(--safe-bottom) + 112px);
+        overflow-x: hidden;
+      }
+      html.native-app .panel-heading {
+        margin-bottom: 14px;
+      }
+      html.native-app .panel-heading h2 {
+        font-size: 1.4rem;
+        line-height: 1.2;
+      }
+      html.native-app .panel-heading p {
+        margin-top: 6px;
+        font-size: .8rem;
+        line-height: 1.45;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+      html.native-app #loginScreen {
+        padding-top: calc(var(--nav-offset) + 18px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <a href="index.html" class="nav-logo">
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none">
+      <rect x="6" y="6" width="68" height="68" rx="16" fill="#7DC900"/>
+      <path d="M22 24h6l4.5 23a4 4 0 0 0 3.9 3.2h17.8a4 4 0 0 0 3.9-3.2L62 33H30" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="38" cy="58" r="3.6" fill="#111"/>
+      <circle cx="53" cy="58" r="3.6" fill="#111"/>
+    </svg>
+    <span class="nav-brand">Comercio <em>e-Bogotá</em></span>
+  </a>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="registro.html">Registrarse</a></li>
+    <li id="navUserItem" style="display:none"><span id="navUserName" style="color:var(--gold);font-size:.82rem;font-weight:600;padding:6px 14px;background:rgba(125,201,0,.1);border-radius:6px;border:1px solid var(--border)"></span></li>
+  </ul>
+</nav>
+
+<!--  LOGIN SCREEN  -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg style="width:32px;height:32px" viewBox="0 0 80 80" fill="none">
+      <rect x="6" y="6" width="68" height="68" rx="16" fill="#7DC900"/>
+      <path d="M22 24h6l4.5 23a4 4 0 0 0 3.9 3.2h17.8a4 4 0 0 0 3.9-3.2L62 33H30" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="38" cy="58" r="3.6" fill="#111"/>
+      <circle cx="53" cy="58" r="3.6" fill="#111"/>
+    </svg>
+      <span class="nav-brand" style="font-size:1.2rem">Comercio <em>e-Bogotá</em></span>
+    </div>
+    <h2 class="login-title">Panel de cliente</h2>
+    <p class="login-sub">Ingresa con tu usuario y contraseña para gestionar tu negocio.</p>
+
+    <div class="login-form" id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Usuario (correo electrónico)</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="tucorreo@ejemplo.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="loginPw" placeholder="••••••••" />
+        <div style="margin-top:6px;text-align:right"><a class="recover-link" onclick="openRecover('contraseña')">Recuperar contraseña</a></div>
+      </div>
+      <div id="loginError" class="alert alert-error" style="display:none"><span>✕</span> Usuario o contraseña incorrectos. Verifica tus datos.</div>
+      <button class="btn btn-gold btn-full btn-lg" onclick="doLogin()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Iniciar sesión
+      </button>
+    </div>
+
+    <div class="divider-text" style="margin:20px 0;font-size:.8rem">Otras opciones</div>
+    <div style="display:flex;gap:10px;margin-bottom:20px">
+      <button class="btn btn-ghost btn-sm btn-full" onclick="openRecover('usuario')">Recuperar usuario</button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="openRecover('cuenta')">Recuperar cuenta</button>
+    </div>
+
+    <p style="text-align:center;font-size:.83rem;color:var(--text-muted)">¿No tienes cuenta? <a href="registro.html" style="color:var(--gold);text-decoration:none;font-weight:600">Regístrate gratis →</a></p>
+  </div>
+</div>
+
+<!--  RECOVERY MODAL  -->
+<div class="modal-overlay" id="recoverModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRecover()">✕</button>
+    <h3>Recuperar acceso</h3>
+    <p>Selecciona qué deseas recuperar:</p>
+    <div class="rec-tabs">
+      <div class="rec-tab active" onclick="setRecTab('usuario',this)">Usuario</div>
+      <div class="rec-tab" onclick="setRecTab('contraseña',this)">Contraseña</div>
+      <div class="rec-tab" onclick="setRecTab('cuenta',this)">Cuenta</div>
+    </div>
+    <div id="rec-usuario">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Nombre del negocio o empresa</label>
+        <input type="text" class="form-input" id="recNegocio" placeholder="Mi Empresa" />
+      </div>
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px">Recibirás tu nombre de usuario en el correo registrado.</p>
+    </div>
+    <div id="rec-contraseña" style="display:none">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Correo electrónico (nombre de usuario)</label>
+        <input type="email" class="form-input" id="recEmail" placeholder="tucorreo@ejemplo.com" />
+      </div>
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px">Recibirás una contraseña temporal en tu correo registrado.</p>
+    </div>
+    <div id="rec-cuenta" style="display:none">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Nombre del negocio o empresa</label>
+        <input type="text" class="form-input" id="recCuenta" placeholder="Mi Empresa" />
+      </div>
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px">Recibirás tu usuario y una contraseña temporal en el correo registrado.</p>
+    </div>
+    <div id="recSuccess" class="alert alert-success" style="display:none;margin-bottom:16px"><span>✓</span> <span id="recSuccessMsg"></span></div>
+    <button class="btn btn-gold btn-full" onclick="doRecover()">Enviar información</button>
+  </div>
+</div>
+
+<!--  PANEL SCREEN  -->
+<div id="panelScreen">
+  <div class="panel-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="panel-sidebar">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sbAvatar">
+          <img id="sbAvatarImg" src="" alt="" />
+          <span class="av-icon">👤</span>
+        </div>
+        <div>
+          <div class="sidebar-name" id="sbName">Mi Negocio</div>
+          <div class="sidebar-plan" id="sbPlan">GRATIS</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" onclick="showSection('cuenta',this)">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6l1 2h3a1 1 0 011 1v16a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h3l1-2z"/><path d="M9 12h6"/><path d="M9 16h4"/><path d="M9 8h6"/></svg>
+          </span><span class="link-text">Mi Cuenta</span>
+        </a>
+        <a class="sidebar-link" onclick="showSection('negocio',this)">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+          </span><span class="link-text">Mi Negocio</span>
+        </a>
+        <a class="sidebar-link" onclick="showSection('promociones',this)">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11v2"/><path d="M5 9h4l7-4v14l-7-4H5z"/><path d="M9 14l1.5 5h2L11 14"/></svg>
+          </span><span class="link-text">Promociones</span>
+        </a>
+        <div class="sidebar-sep"></div>
+        <a class="sidebar-link" href="index.html">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 010 18"/><path d="M12 3a15 15 0 000 18"/></svg>
+          </span><span class="link-text">Ver plataforma</span>
+        </a>
+      </nav>
+      <div class="sidebar-logout">
+        <button class="btn btn-danger btn-sm btn-full" onclick="doLogout()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="link-text">Salir</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="panel-content">
+
+      <!-- ── MI CUENTA ── -->
+      <div class="panel-section active" id="sec-cuenta">
+        <div class="panel-heading">
+          <div class="eyebrow">Panel de cliente</div>
+          <h2>Mi Cuenta</h2>
+        <p>Gestiona tu suscripción y administra tu acceso.</p>
+        </div>
+
+        <!-- Subscription info -->
+        <div class="subs-card">
+          <h3>Mi suscripción <span id="planBadge" class="badge badge-gold">GRATIS</span></h3>
+          <div class="subs-grid">
+            <div class="subs-field"><span class="subs-key">Plan</span><span class="subs-val" id="planNombre">GRATIS</span></div>
+            <div class="subs-field"><span class="subs-key">Fecha activación</span><span class="subs-val" id="planActivacion">—</span></div>
+            <div class="subs-field"><span class="subs-key">Fecha vencimiento</span><span class="subs-val" id="planVencimiento">—</span></div>
+            <div class="subs-field"><span class="subs-key">Valor del plan</span><span class="subs-val" id="planValor">$0</span></div>
+            <div class="subs-field"><span class="subs-key">Cantidad de imágenes</span><span class="subs-val" id="planImagenes">0</span></div>
+            <div class="subs-field"><span class="subs-key">Promociones (semana / mes)</span><span class="subs-val" id="planPromos">1 por semana (4 al mes)</span></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" onclick="showSection('cambiarPw',this,true)">Cambiar contraseña</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarCancelar()">Cancelar suscripción</button>
+          </div>
+        </div>
+
+        <!-- Actualizar suscripción -->
+        <div class="subs-card">
+          <h3>Actualizar suscripción</h3>
+          <p style="font-size:.875rem;color:var(--text-muted);margin-bottom:20px">Selecciona el tiempo de activación. El sistema calculará el valor a pagar.</p>
+          <div class="act-subs-grid" id="planOptions">
+            <label class="plan-option selected"><input type="radio" name="planSel" value="1" checked /><div class="po-tag">1 Mes</div><div class="po-price"><sup>$</sup>10.000<small>/plan</small></div><div class="po-total">Valor total: $10.000</div></label>
+            <label class="plan-option"><input type="radio" name="planSel" value="3" /><div class="po-tag">3 Meses</div><div class="po-price"><sup>$</sup>25.000<small>/plan</small></div><div class="po-total">Valor total: $25.000</div></label>
+            <label class="plan-option"><input type="radio" name="planSel" value="6" /><div class="po-tag">6 Meses</div><div class="po-price"><sup>$</sup>50.000<small>/plan</small></div><div class="po-total">Valor total: $50.000</div></label>
+            <label class="plan-option"><input type="radio" name="planSel" value="12" /><div class="po-tag">12 Meses</div><div class="po-price"><sup>$</sup>90.000<small>/plan</small></div><div class="po-total">Valor total: $90.000</div></label>
+          </div>
+
+          <!-- Payment proof upload -->
+          <div class="form-label" style="margin-bottom:8px">Soporte de pago <span style="color:var(--red)">*</span></div>
+          <div class="payment-proof" id="pfZone">
+            <input type="file" id="pfInput" accept="image/*,.pdf" style="display:none" />
+            <div id="pfEmpty">
+              <div class="pf-icon">📎</div>
+              <p><strong>Clic para adjuntar soporte de pago</strong></p>
+              <p>Imagen (JPG/PNG) o PDF del comprobante de transferencia</p>
+            </div>
+            <div id="pfPreviewWrap" class="pf-preview">
+              <img id="pfThumb" class="pf-thumb" src="" alt="Soporte" />
+              <div class="pf-info"><strong id="pfName"></strong><span id="pfSize"></span></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:16px">
+            <label class="form-label">Fecha de pago <span style="color:var(--red)">*</span></label>
+            <input type="date" class="form-input" id="fechaPago" style="max-width:220px" />
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label class="form-label">Medio de pago</label>
+            <select class="form-select" id="medioPago" style="max-width:280px">
+              <option>Daviplata</option><option>Nequi</option><option>Bancolombia</option>
+              <option>Efecty</option><option>Baloto</option><option>4-72</option>
+              <option>Mercado Pago</option><option>Otro</option>
+            </select>
+          </div>
+          <button class="btn btn-gold" style="margin-top:20px" onclick="actualizarSuscripcion()">
+            Actualizar suscripción
+          </button>
+        </div>
+
+        <!-- Código Promocional -->
+        <div class="subs-card">
+          <h3>Código Promocional</h3>
+          <p id="panelPromoCodeHelp" style="font-size:.875rem;color:var(--text-muted);margin-bottom:16px">Solicita tu código de prueba gratuita (30 días) por WhatsApp desde la página principal y actívalo aquí.</p>
+          <div class="promo-code-box">
+            <input type="text" class="form-input" id="promoCodeInput" placeholder="Ingresa tu código aquí" style="text-transform:uppercase;letter-spacing:.12em;font-family:var(--font-main);max-width:280px" />
+            <button class="btn btn-gold" onclick="activarCodigo()">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CAMBIAR CONTRASEÑA ── -->
+      <div class="panel-section" id="sec-cambiarPw">
+        <div class="panel-heading">
+          <div class="eyebrow">Seguridad</div>
+          <h2>Cambiar contraseña</h2>
+        </div>
+        <div class="subs-card" style="max-width:480px">
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Contraseña actual</label>
+            <input type="password" class="form-input" id="pwActual" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Nueva contraseña</label>
+            <input type="password" class="form-input" id="pwNueva" placeholder="Mínimo 8 caracteres" />
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">Confirmar nueva contraseña</label>
+            <input type="password" class="form-input" id="pwNueva2" placeholder="Repite la contraseña" />
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-gold" onclick="cambiarPw()">Guardar contraseña</button>
+            <button class="btn btn-outline" onclick="showSection('cuenta',null)">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MI NEGOCIO ── -->
+      <div class="panel-section" id="sec-negocio">
+        <div class="panel-heading">
+          <div class="eyebrow">Configuración</div>
+          <h2>Mi Negocio</h2>
+          <p>Configura la información que verán los clientes en tu página dentro de la plataforma.</p>
+        </div>
+
+        <div class="subs-card">
+          <!-- Logo -->
+          <div class="neg-logo-section">
+            <div class="neg-logo-wrap">
+              <img id="negLogoImg" class="neg-logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231F1F1F'/%3E%3Ctext x='50' y='60' font-size='36' text-anchor='middle' fill='%232D6200'%3E%3C/text%3E%3C/svg%3E" alt="Logo negocio" onclick="document.getElementById('negLogoInput').click()" title="Clic para cambiar logo" />
+              <div class="neg-logo-overlay">✎</div>
+              <input type="file" id="negLogoInput" accept="image/*" style="display:none" />
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:6px">Logo / Imagen principal del negocio</div>
+              <p style="font-size:.85rem;color:var(--text-muted);line-height:1.7;max-width:380px">Haz clic sobre la imagen para cambiarla. La imagen del negocio puede actualizarse en cualquier momento. Recomendamos formato JPG o PNG, dimensiones mínimas 300×300 px.</p>
+              <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="document.getElementById('negLogoInput').click()">
+                📷 Cambiar imagen
+              </button>
+            </div>
+          </div>
+
+          <!-- Datos básicos -->
+          <div class="neg-grid-basic">
+            <div class="form-group">
+              <label class="form-label">Nombre del negocio <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-input" id="negNombre" placeholder="MI EMPRESA" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Correo electrónico</label>
+              <input type="email" class="form-input" id="negEmail" placeholder="negocio@correo.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dirección <span style="color:var(--red)">*</span></label>
+              <input type="text" class="form-input" id="negDir" placeholder="CR 15 100 92" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Localidad <span style="color:var(--red)">*</span></label>
+              <select class="form-select" id="negLocalidad">
+                <option value="">Selecciona...</option>
+                <option>Antonio Nariño</option><option>Barrios Unidos</option><option>Bosa</option>
+                <option>Chapinero</option><option>Ciudad Bolívar</option><option>Engativá</option>
+                <option>Fontibón</option><option>Kennedy</option><option>La Candelaria</option>
+                <option>Los Mártires</option><option>Puente Aranda</option><option>Rafael Uribe Uribe</option>
+                <option>San Cristóbal</option><option>Santa Fe</option><option>Suba</option>
+                <option>Sumapaz</option><option>Teusaquillo</option><option>Tunjuelito</option>
+                <option>Usaquén</option><option>Usme</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoría <span style="color:var(--red)">*</span></label>
+              <select class="form-select" id="negCategoria">
+                <option value="">Selecciona...</option>
+                <option>Almacenes de calzado</option><option>Almacenes de ropa</option><option>Autolavados</option>
+                <option>Barberías</option><option>Carnicerías</option><option>Droguerías</option>
+                <option>Electrónica y tecnología</option><option>Ferreterías</option><option>Floristerías</option>
+                <option>Fruterías y verduras</option><option>Panaderías</option><option>Peluquerías</option>
+                <option>Restaurantes</option><option>Salas de belleza</option><option>Talleres mecánicos</option>
+                <option>Veterinarias</option><option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp</label>
+              <input type="tel" class="form-input" id="negWp" placeholder="3XX XXX XXXX" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">¿Qué hace su negocio? <span style="color:var(--red)">*</span></label>
+            <textarea class="form-input form-textarea" id="negDesc" placeholder="Describa brevemente los productos o servicios que ofrece su negocio. Este campo es clave para aparecer en las búsquedas." style="min-height:80px"></textarea>
+            <span class="form-hint">Campo obligatorio para aparecer en las búsquedas de la plataforma.</span>
+          </div>
+
+          <!-- Redes sociales -->
+          <div class="form-label" style="margin-bottom:10px">Redes sociales</div>
+          <div class="neg-grid-social">
+            <div class="form-group"><label class="form-label" style="font-size:.65rem">Instagram</label><input type="url" class="form-input" id="negIg" placeholder="@mi_negocio" /></div>
+            <div class="form-group"><label class="form-label" style="font-size:.65rem">Facebook</label><input type="url" class="form-input" id="negFb" placeholder="facebook.com/..." /></div>
+            <div class="form-group"><label class="form-label" style="font-size:.65rem">YouTube</label><input type="url" class="form-input" id="negYt" placeholder="youtube.com/..." /></div>
+          </div>
+
+          <!-- Horarios -->
+          <div class="form-label" style="margin-bottom:10px">Horarios de atención</div>
+          <div class="days-grid" id="daysGrid">
+            <div class="day-chip on" data-day="L" title="Lunes">L</div>
+            <div class="day-chip on" data-day="M" title="Martes">M</div>
+            <div class="day-chip on" data-day="X" title="Miércoles">X</div>
+            <div class="day-chip on" data-day="J" title="Jueves">J</div>
+            <div class="day-chip on" data-day="V" title="Viernes">V</div>
+            <div class="day-chip" data-day="S" title="Sábado">S</div>
+            <div class="day-chip" data-day="D" title="Domingo">D</div>
+          </div>
+          <div class="hours-row" style="margin-bottom:20px">
+            <label>Apertura:</label>
+            <input type="time" class="form-input" id="horaApertura" value="08:00" style="width:120px" />
+            <label>Cierre:</label>
+            <input type="time" class="form-input" id="horaCierre" value="19:00" style="width:120px" />
+          </div>
+
+          <!-- Domicilios -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding:14px;background:var(--dark-3);border-radius:8px;border:1px solid var(--border)">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.875rem;color:var(--text-muted)">
+              <input type="checkbox" id="domicilios" style="accent-color:var(--gold);width:16px;height:16px" />
+              Acepta domicilios
+            </label>
+            <span style="font-size:.78rem;color:var(--text-muted)">Activa esta opción si tu negocio realiza entregas a domicilio en Bogotá.</span>
+          </div>
+
+          <!-- Gallery -->
+          <div class="gallery-section">
+            <div class="gallery-header">
+              <div class="gallery-title">Cargar imágenes del negocio</div>
+              <span class="gallery-count"><span id="galleryCount">0</span> / <span id="galleryMaxImages">10</span> imágenes</span>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+              <div class="gallery-add" id="galleryAddBtn" onclick="document.getElementById('galleryInput').click()">
+                <span class="add-icon">+</span>
+                <span>Cargar archivos</span>
+              </div>
+            </div>
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none" />
+            <p class="gallery-note">Formatos JPG o PNG. Dimensiones recomendadas: 900×600 px. Máximo 75KB por imagen. La plataforma acepta un máximo de <strong id="galleryMaxImagesStrong">10 imágenes</strong> por negocio.</p>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:28px;flex-wrap:wrap">
+            <button class="btn btn-gold" onclick="guardarNegocio()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar negocio
+            </button>
+            <button class="btn btn-outline" onclick="publicarNegocio()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              Publicar negocio
+            </button>
+          </div>
+        </div>
+
+        <!-- ── ENLACE DIRECTO (persiste tras publicar) ── -->
+        <div class="subs-card" id="linkCard" style="display:none;border-color:rgba(125,201,0,.4);background:linear-gradient(135deg,rgba(125,201,0,.04),var(--dark-2))">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:38px;height:38px;border-radius:50%;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);display:flex;align-items:center;justify-content:center;font-size:1.1rem"></div>
+            <div>
+              <div style="font-weight:600;font-size:.95rem;line-height:1.2;margin-bottom:3px">Negocio publicado</div>
+              <span class="badge badge-green" style="font-size:.62rem">EN LNEA</span>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:12px;line-height:1.65">Enlace directo de tu negocio — compártelo con tus clientes:</p>
+          <div style="background:var(--dark-3);border:1px solid rgba(125,201,0,.3);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span id="panelLinkUrl" style="flex:1;font-family:var(--font-main);font-size:.75rem;color:var(--gold);word-break:break-all;line-height:1.5"></span>
+            <button onclick="copyPanelLink()" id="copyPanelBtn" style="flex-shrink:0;background:var(--gold);border:none;border-radius:7px;color:#0E0E0E;cursor:pointer;padding:8px 16px;font-size:.75rem;font-weight:700;letter-spacing:.04em;transition:background .2s;white-space:nowrap">
+              Copiar enlace
+            </button>
+          </div>
+          <a id="panelLinkAnchor" href="#" target="_blank" class="btn btn-outline btn-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Ver mi página pública
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ── PROMOCIONES ── -->
+      <div class="panel-section" id="sec-promociones">
+        <div class="panel-heading">
+          <div class="eyebrow">Marketing</div>
+          <h2>Promociones</h2>
+          <p id="panelPromoLimitDesc">Crea y gestiona tus promociones semanales. Máximo 4 por mes (1 por semana activa).</p>
+        </div>
+
+        <button class="btn btn-gold" style="margin-bottom:20px" onclick="togglePromoForm()">
+          + Crear nueva promoción
+        </button>
+
+        <!-- New promo form -->
+        <div class="promo-form-card" id="promoFormCard">
+          <h3 style="font-family:var(--font-main);font-size:1.3rem;font-weight:600;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)">Nueva Promoción</h3>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Título de la promoción <span style="color:var(--red)">*</span></label>
+            <input type="text" class="form-input" id="promoTitulo" placeholder="Ej: MI PROMOCION" />
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Contenido de la promoción <span style="color:var(--red)">*</span></label>
+            <div class="rich-toolbar">
+              <button class="rtb" onclick="execCmd('bold')" title="Negrita"><b>B</b></button>
+              <button class="rtb" onclick="execCmd('italic')" title="Cursiva"><i>I</i></button>
+              <button class="rtb" onclick="execCmd('underline')" title="Subrayado"><u>U</u></button>
+              <button class="rtb" onclick="execCmd('fontSize','3')" title="Fuente normal">Aa</button>
+              <button class="rtb" onclick="execCmd('fontSize','5')" title="Fuente grande">AA</button>
+              <button class="rtb" onclick="execCmd('justifyCenter')" title="Centrar">≡</button>
+              <button class="rtb" onclick="execCmd('insertUnorderedList')" title="Lista">•</button>
+              <button class="rtb" onclick="execCmd('foreColor','#8FE000')" title="Color dorado" style="color:var(--gold)">A</button>
+              <button class="rtb" onclick="execCmd('foreColor','#E55')" title="Color rojo" style="color:#E55">A</button>
+              <button class="rtb" onclick="execCmd('removeFormat')" title="Quitar formato">✕</button>
+            </div>
+            <div class="rich-editor" id="promoEditor" contenteditable="true" data-placeholder="Escribe el contenido de tu promoción aquí. Ejemplo:&#10;Lleva carne de Primera calidad de res.&#10;LIBRA: 9000&#10;KILO: 16000&#10;Solo por esta semana."></div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Imagen de la promoción</label>
+            <div class="promo-img-upload" id="promoImgZone" onclick="document.getElementById('promoImgInput').click()">
+              <input type="file" id="promoImgInput" accept="image/*" multiple style="display:none" />
+              <div>📸 Haz clic para cargar hasta 3 imágenes para tu promoción</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px">JPG o PNG recomendado. Máximo 3 imágenes.</div>
+              <img id="promoImgPreview" class="promo-img-preview" alt="Preview" />
+              <div id="promoImgName" class="promo-img-name"></div>
+              <div id="promoImagesList" class="promo-images-list"></div>
+            </div>
+          </div>
+
+          <div class="alert alert-info" style="margin-bottom:20px">
+            <span>ℹ</span>
+            <div>Recuerda: solo puedes publicar <strong>1 promoción semanal</strong>. No podrás crear dos promociones al tiempo. La plataforma controla automáticamente la fecha de inicio y fin de cada promoción.</div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-gold" onclick="crearPromoción()">
+              ✦ Crear promoción
+            </button>
+            <button class="btn btn-outline" onclick="togglePromoForm()">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- Promo list -->
+        <div class="promo-list" id="promoList">
+          <div style="text-align:center;padding:40px;color:var(--text-muted);font-size:.875rem">
+            <div style="font-size:2rem;margin-bottom:12px">📣</div>
+            No se han creado promociones. Haz clic en "+" para crear una promoción.<br>
+            <span id="panelPromoLimitReminder" style="font-size:.78rem;margin-top:6px;display:block">Recuerda que son 4 promociones al mes, una por semana.</span>
+          </div>
+        </div>
+      
+        <div class="wa-module-wrap" id="wa-module-wrap">
+        <div class="panel-heading">
+          <div class="eyebrow">Difusion</div>
+          <h2>Contactos y Promociones WhatsApp</h2>
+          <p>Guarda clientes, crea mensajes y abre WhatsApp con envio listo.</p>
+        </div>
+
+        <div class="wa-tabs">
+          <button type="button" class="wa-tab-btn active" data-wa-tab="contacts" onclick="showWATab('contacts', this)">👥 Contactos <span class="wa-chip" id="waContactsCount">0</span></button>
+          <button type="button" class="wa-tab-btn" data-wa-tab="promos" onclick="showWATab('promos', this)">🎯 Promociones <span class="wa-chip" id="waPromosCount">0</span></button>
+          <button type="button" class="wa-tab-btn" data-wa-tab="send" onclick="showWATab('send', this)">📲 Enviar</button>
+        </div>
+
+        <div class="wa-tab-panel active" id="wa-tab-contacts">
+          <div class="wa-tip">Aqui guardas clientes para difusion. Campos requeridos: nombre y celular.</div>
+          <div class="wa-card">
+            <h3>Agregar contacto</h3>
+            <p>Usa solo digitos para el celular (ej: 3001234567).</p>
+            <div class="wa-grid-3">
+              <div class="form-group">
+                <label class="form-label">Nombre *</label>
+                <input type="text" class="form-input" id="waContactName" placeholder="Ej: Maria Garcia" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-input" id="waContactEmail" placeholder="cliente@correo.com" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Celular *</label>
+                <input type="tel" class="form-input" id="waContactPhone" placeholder="3001234567" />
+              </div>
+            </div>
+            <div class="wa-actions" style="margin-top:12px">
+              <button type="button" class="btn btn-gold btn-sm" id="waAddContactBtn">Guardar contacto</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="waImportCsvBtn">Importar CSV</button>
+              <input type="file" id="waCsvInput" accept=".csv,text/csv" style="display:none" />
+              <span class="wa-foot">CSV esperado: Nombre, Correo, Celular</span>
+            </div>
+          </div>
+          <div class="wa-card">
+            <div class="wa-actions" style="justify-content:space-between">
+              <div>
+                <h3 style="margin:0">Mis contactos</h3>
+                <p style="margin:3px 0 0">Listado de clientes guardados.</p>
+              </div>
+              <input type="text" class="wa-search" id="waContactSearch" placeholder="Buscar por nombre, correo o celular" />
+            </div>
+            <div id="waContactsEmpty" class="wa-empty">No hay contactos guardados.</div>
+            <div class="wa-table-wrap" id="waContactsTableWrap" style="display:none">
+              <table class="wa-table">
+                <thead>
+                  <tr><th>Nombre</th><th>Correo</th><th>Celular</th><th>Acciones</th></tr>
+                </thead>
+                <tbody id="waContactsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="wa-tab-panel" id="wa-tab-promos">
+          <div class="wa-tip">Crea mensajes promocionales para WhatsApp. Puedes guardarlos y reutilizarlos.</div>
+          <div class="wa-grid-2">
+            <div class="wa-card">
+              <h3>Nueva promocion</h3>
+              <p>Define icono, titulo y mensaje.</p>
+              <div class="wa-emoji-list" id="waEmojiList"></div>
+              <div class="form-group" style="margin-bottom:12px">
+                <label class="form-label">Titulo *</label>
+                <input type="text" class="form-input" id="waPromoTitle" placeholder="Ej: 20% descuento hoy" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mensaje *</label>
+                <textarea class="form-input form-textarea" id="waPromoMessage" placeholder="Detalle de oferta, vigencia y condiciones." style="min-height:130px"></textarea>
+              </div>
+              <div class="wa-upload">
+                <div class="wa-upload-row">
+                  <button type="button" class="btn btn-ghost btn-sm" id="waPromoImageBtn">Cargar imagen promocional</button>
+                  <button type="button" class="btn btn-danger btn-sm" id="waPromoImageClearBtn" style="display:none">Quitar imagen</button>
+                  <span class="wa-upload-name" id="waPromoImageName">Sin imagen seleccionada</span>
+                </div>
+                <input type="file" id="waPromoImageInput" accept="image/*" style="display:none" />
+                <img id="waPromoImagePreview" class="wa-upload-preview" alt="Vista previa de promoción" />
+              </div>
+              <button type="button" class="btn btn-gold btn-sm" id="waSavePromoBtn" style="margin-top:12px">Guardar promocion</button>
+            </div>
+            <div class="wa-card">
+              <h3>Vista previa</h3>
+              <p>Asi llega el mensaje al cliente.</p>
+              <div class="wa-preview">
+                <div class="wa-bubble" id="waPreviewBubble"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wa-card">
+            <h3>Promociones guardadas</h3>
+            <p id="waPromosSubtitle">0 promociones guardadas.</p>
+            <div id="waPromosEmpty" class="wa-empty">No hay promociones guardadas.</div>
+            <div id="waPromosCards" class="wa-promo-cards" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="wa-tab-panel" id="wa-tab-send">
+          <div class="wa-tip">Selecciona promocion, elige contactos y abre WhatsApp con envio listo.</div>
+          <div class="wa-card">
+            <div class="form-group" style="max-width:420px;margin-bottom:14px">
+              <label class="form-label">Promoción a enviar</label>
+              <select class="form-select" id="waSendPromoSelect"></select>
+            </div>
+            <div class="wa-send-toolbar">
+              <button type="button" class="btn btn-outline btn-sm" id="waSelectAllBtn">Seleccionar todos</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="waClearAllBtn">Limpiar seleccion</button>
+              <button type="button" class="btn btn-gold btn-sm" id="waSendSelectedBtn">Enviar seleccionados</button>
+            </div>
+            <div id="waSendEmpty" class="wa-empty">Necesitas al menos 1 contacto y 1 promocion para enviar.</div>
+            <div id="waSendContactsWrap" style="display:none">
+              <div class="wa-contact-pills" id="waSendContacts"></div>
+              <div class="wa-foot" id="waSendSummary"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+          </div>
+    </main>
+  </div>
+</div>
+
+<a href="#" class="whatsapp-fab"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.372 0 12c0 2.116.553 4.103 1.522 5.83L.044 23.95l6.263-1.643A11.954 11.954 0 0012 24c6.628 0 12-5.372 12-12S18.627 0 12 0zM12 22c-1.84 0-3.57-.497-5.063-1.364l-.363-.214-3.718.975.99-3.63-.237-.374A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></a>
+
+<script src="js/app.js?v=20260320fix9"></script>
+<script>
+// ── Auth ─────────────────────────────────────────────────────
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  const errEl = document.getElementById('loginError');
+
+  if (!email || !pw) { showToast('Ingresa usuario y contraseña.', 'error'); return; }
+
+  // Demo: any email+pw combination works, or match stored user
+  const stored = Store.get('user');
+  const match  = stored ? (stored.email === email) : true;
+
+  if (!match) {
+    errEl.style.display = 'flex'; return;
+  }
+
+  errEl.style.display = 'none';
+  const user = stored || { email, nombre: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), plan: 'GRATIS' };
+  user.loggedIn = true;
+  Store.set('user', user);
+  loadPanel(user);
+}
+
+document.getElementById('loginPw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function loadPanel(user) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('panelScreen').style.display = 'block';
+  document.getElementById('sbName').textContent = user.nombre || user.email;
+  document.getElementById('sbPlan').textContent = user.plan || 'GRATIS';
+  document.getElementById('planBadge').textContent = user.plan || 'GRATIS';
+  document.getElementById('planNombre').textContent = user.plan || 'GRATIS';
+
+  const navUserItem = document.getElementById('navUserItem');
+  navUserItem.style.display = '';
+  document.getElementById('navUserName').textContent = user.nombre || user.email;
+
+  // Load stored negocio data
+  const neg = Store.get('negocio', {});
+  if (neg.nombre) {
+    document.getElementById('negNombre').value = neg.nombre;
+    // Show direct link card if already saved
+    const url = buildNegocioURL(neg.nombre);
+    const linkCard = document.getElementById('linkCard');
+    const linkEl   = document.getElementById('panelLinkUrl');
+    const anchor   = document.getElementById('panelLinkAnchor');
+    if (linkEl)   linkEl.textContent = url;
+    if (anchor)   anchor.href = url;
+    if (linkCard) linkCard.style.display = 'block';
+  }
+  if (neg.email)  document.getElementById('negEmail').value  = neg.email;
+  if (neg.dir)    document.getElementById('negDir').value    = neg.dir;
+  if (neg.logo) {
+    const imgEl = document.getElementById('negLogoImg');
+    imgEl.src = neg.logo;
+    const av = document.getElementById('sbAvatarImg');
+    av.src = neg.logo; av.classList.add('show');
+    document.querySelector('#sbAvatar .av-icon').style.display = 'none';
+  }
+
+  // Load gallery
+  const gal = Store.get('gallery', []);
+  gal.forEach(src => addGalleryThumb(src));
+
+  // Load promos
+  const promos = Store.get('promos', []);
+  if (promos.length) {
+    document.getElementById('promoList').innerHTML = '';
+    promos.forEach(p => renderPromoItem(p));
+  }
+
+  if (typeof window.initWAModule === 'function') window.initWAModule(true);
+
+  // Set date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('fechaPago').value = today;
+  document.getElementById('planActivacion').textContent = today.split('-').reverse().join('/');
+  const exp = new Date(); exp.setDate(exp.getDate() + 8);
+  document.getElementById('planVencimiento').textContent = exp.toISOString().split('T')[0].split('-').reverse().join('/');
+}
+
+function doLogout() {
+  const u = Store.get('user'); if (u) { u.loggedIn = false; Store.set('user', u); }
+  document.getElementById('panelScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('navUserItem').style.display = 'none';
+  showToast('Sesión cerrada.', 'info');
+}
+
+// Auto-login if stored
+document.addEventListener('DOMContentLoaded', () => {
+  const u = Store.get('user');
+  if (u && u.loggedIn) loadPanel(u);
+});
+
+// ── Section navigation ────────────────────────────────────────
+function showSection(name, linkEl, noscroll) {
+  document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const sec = document.getElementById('sec-' + name);
+  if (sec) sec.classList.add('active');
+  if (linkEl) linkEl.classList.add('active');
+  if (name === 'promociones' && typeof window.initWAModule === 'function') window.initWAModule(true);
+  if (!noscroll) {
+    const panelContent = document.querySelector('.panel-content');
+    if (panelContent && typeof panelContent.scrollTo === 'function') {
+      panelContent.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+}
+
+// ── Recovery modal ────────────────────────────────────────────
+let currentRecTab = 'usuario';
+function openRecover(tab) {
+  document.getElementById('recoverModal').classList.add('show');
+  setRecTab(tab, document.querySelector(`.rec-tab:nth-child(${tab==='usuario'?1:tab==='contraseña'?2:3})`));
+}
+function closeRecover() { document.getElementById('recoverModal').classList.remove('show'); document.getElementById('recSuccess').style.display='none'; }
+function setRecTab(tab, el) {
+  currentRecTab = tab;
+  document.querySelectorAll('.rec-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  ['usuario','contraseña','cuenta'].forEach(t => {
+    const el = document.getElementById('rec-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+}
+function doRecover() {
+  const msgs = { usuario:'El nombre de usuario fue enviado a tu correo registrado.', contraseña:'Se envió una contraseña temporal a tu correo.', cuenta:'Los datos de acceso fueron enviados a tu correo registrado.' };
+  const el = document.getElementById('recSuccess');
+  document.getElementById('recSuccessMsg').textContent = msgs[currentRecTab];
+  el.style.display = 'flex';
+  showToast('¡Listo! Revisa tu correo electrónico.', 'success');
+}
+
+// ── Mi Cuenta ─────────────────────────────────────────────────
+document.querySelectorAll('.plan-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.plan-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+  });
+});
+
+const pfZone = document.getElementById('pfZone');
+const pfInput = document.getElementById('pfInput');
+pfZone.addEventListener('click', () => pfInput.click());
+pfInput.addEventListener('change', () => {
+  const file = pfInput.files[0]; if (!file) return;
+  pfZone.classList.add('has-file');
+  document.getElementById('pfName').textContent = file.name;
+  document.getElementById('pfSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+  document.getElementById('pfPreviewWrap').style.display = 'flex';
+  if (file.type.startsWith('image/')) {
+    const r = new FileReader();
+    r.onload = e => { document.getElementById('pfThumb').src = e.target.result; };
+    r.readAsDataURL(file);
+  } else {
+    document.getElementById('pfThumb').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%237DC900"%3E%3Cpath d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/%3E%3Cpolyline points="14 2 14 8 20 8" stroke="white" fill="none"/%3E%3C/svg%3E';
+  }
+  document.getElementById('pfEmpty').style.display = 'none';
+  showToast('Soporte adjuntado ✓', 'success');
+});
+
+function actualizarSuscripcion() {
+  if (!pfInput.files[0]) { showToast('Adjunta el soporte de pago antes de continuar.', 'error'); return; }
+  const selected = document.querySelector('input[name=planSel]:checked');
+  const meses = selected?.value || '1';
+  const selectedCard = selected ? selected.closest('.plan-option') : null;
+  const priceText = selectedCard?.querySelector('.po-price')?.textContent || '';
+  const priceDigits = String(priceText).replace(/[^\d]/g, '');
+  const fallbackPrecios = {'1':10000,'3':25000,'6':50000,'12':90000};
+  const precioPlan = Number(priceDigits || fallbackPrecios[meses] || 0);
+  const valorPlanFmt = (window.CEBFormat && typeof window.CEBFormat.number === 'function')
+    ? window.CEBFormat.number(precioPlan)
+    : Number(precioPlan).toLocaleString('es-419');
+  if (confirm(`¿Está seguro de realizar la actualización de la suscripción?\nPlan: ${meses} mes(es) — Valor total: $${valorPlanFmt}`)) {
+    showToast('¡Suscripción enviada a verificación! Recibirás un correo de confirmación en máximo 2 horas.', 'success', 5000);
+    const u = Store.get('user', {}); u.plan = `PLAN ÚNICO ${meses} MES${meses>1?'ES':''}`; Store.set('user', u);
+    document.getElementById('planNombre').textContent = u.plan;
+    document.getElementById('sbPlan').textContent = u.plan;
+    document.getElementById('planBadge').textContent = u.plan;
+    document.getElementById('planImagenes').textContent = '10';
+    document.getElementById('planPromos').textContent = '1 por semana (4 al mes)';
+    document.getElementById('planValor').textContent = '$' + valorPlanFmt;
+  }
+}
+
+function activarCodigo() {
+  const codigo = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+  if (!codigo) { showToast('Ingresa un código promocional.', 'error'); return; }
+  // Simulate validation
+  setTimeout(() => {
+    showToast('¡Actualizado! La suscripción fue actualizada con el código promocional.', 'success', 4000);
+    document.getElementById('planNombre').textContent = 'DEMO';
+    document.getElementById('planImagenes').textContent = '10';
+    document.getElementById('planPromos').textContent = '1 por semana (4 al mes)';
+    const exp = new Date(); exp.setDate(exp.getDate() + 30);
+    document.getElementById('planVencimiento').textContent = exp.toISOString().split('T')[0].split('-').reverse().join('/');
+    document.getElementById('promoCodeInput').value = '';
+  }, 600);
+}
+
+function confirmarCancelar() {
+  if (confirm('¿Está seguro de que desea cancelar su suscripción?')) {
+    showToast('Suscripción cancelada. Tus datos permanecerán activos hasta la fecha de vencimiento.', 'info', 4000);
+  }
+}
+
+function cambiarPw() {
+  const a = document.getElementById('pwActual').value;
+  const n = document.getElementById('pwNueva').value;
+  const n2= document.getElementById('pwNueva2').value;
+  if (!a||!n||!n2) { showToast('Completa todos los campos.', 'error'); return; }
+  if (n !== n2) { showToast('Las contraseñas nuevas no coinciden.', 'error'); return; }
+  if (n.length < 8) { showToast('La nueva contraseña debe tener al menos 8 caracteres.', 'error'); return; }
+  showToast('Contraseña actualizada correctamente ✓', 'success');
+  document.getElementById('pwActual').value = document.getElementById('pwNueva').value = document.getElementById('pwNueva2').value = '';
+  showSection('cuenta', document.querySelector('.sidebar-link'));
+}
+
+// ── Mi Negocio ────────────────────────────────────────────────
+document.getElementById('negLogoInput').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  previewImage(file, document.getElementById('negLogoImg'), (src) => {
+    const av = document.getElementById('sbAvatarImg');
+    av.src = src; av.classList.add('show');
+    document.querySelector('#sbAvatar .av-icon').style.display = 'none';
+    Store.set('negLogoTemp', src);
+    showToast('Logo actualizado ✓', 'success');
+  });
+});
+
+// Days toggle
+document.querySelectorAll('.day-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('on'));
+});
+
+// Gallery
+function getPanelMaxImages() {
+  const limits = (window.__cebPlatformLimits && typeof window.__cebPlatformLimits === 'object')
+    ? window.__cebPlatformLimits
+    : null;
+  const max = Number(limits && limits.max_images);
+  if (Number.isFinite(max) && max > 0) return Math.floor(max);
+  return 10;
+}
+
+const galleryInput = document.getElementById('galleryInput');
+galleryInput.addEventListener('change', function() {
+  const files = Array.from(this.files);
+  const current = document.querySelectorAll('.gallery-thumb').length;
+  const remaining = getPanelMaxImages() - current;
+  if (files.length > remaining) {
+    showToast(`Solo puedes agregar ${remaining} imagen${remaining!==1?'s':''} más (máximo ${getPanelMaxImages()}).`, 'error');
+    return;
+  }
+  files.slice(0, remaining).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => addGalleryThumb(e.target.result);
+    reader.readAsDataURL(file);
+  });
+  this.value = '';
+});
+
+function addGalleryThumb(src) {
+  const total = document.querySelectorAll('.gallery-thumb').length;
+  if (total >= getPanelMaxImages()) return;
+  const grid = document.getElementById('galleryGrid');
+  const addBtn = document.getElementById('galleryAddBtn');
+  const div = document.createElement('div');
+  div.className = 'gallery-thumb';
+  div.innerHTML = `<img src="${src}" alt="Imagen negocio" /><div class="gt-actions"><button class="gt-btn" title="Vista previa" onclick="previewGalleryImg(this)"></button><button class="gt-btn del" title="Eliminar" onclick="removeGalleryThumb(this)">✕</button></div>`;
+  grid.insertBefore(div, addBtn);
+  updateGalleryCount();
+}
+
+function removeGalleryThumb(btn) {
+  if (confirm('¿Eliminar esta imagen?')) {
+    btn.closest('.gallery-thumb').remove();
+    updateGalleryCount();
+  }
+}
+
+function previewGalleryImg(btn) {
+  const img = btn.closest('.gallery-thumb').querySelector('img');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:20px';
+  overlay.innerHTML = `<img src="${img.src}" style="max-width:90%;max-height:90%;border-radius:12px;object-fit:contain" />`;
+  overlay.addEventListener('click', () => overlay.remove());
+  document.body.appendChild(overlay);
+}
+
+function updateGalleryCount() {
+  const count = document.querySelectorAll('.gallery-thumb').length;
+  const maxImages = getPanelMaxImages();
+  document.getElementById('galleryCount').textContent = count;
+  document.getElementById('galleryAddBtn').style.display = count >= maxImages ? 'none' : '';
+}
+
+function guardarNegocio() {
+  const nombre = document.getElementById('negNombre').value.trim();
+  if (!nombre) { showToast('El nombre del negocio es obligatorio.', 'error'); return; }
+
+  const días = {};
+  document.querySelectorAll('.day-chip').forEach(c => { días[c.dataset.day] = c.classList.contains('on'); });
+
+  const data = {
+    nombre,
+    email:       document.getElementById('negEmail').value,
+    dir:         document.getElementById('negDir').value,
+    localidad:   document.getElementById('negLocalidad').value,
+    categoria:   document.getElementById('negCategoria').value,
+    descripcion: document.getElementById('negDesc').value,
+    wp:          document.getElementById('negWp').value,
+    instagram:   document.getElementById('negIg').value,
+    facebook:    document.getElementById('negFb').value,
+    youtube:     document.getElementById('negYt').value,
+    logo:        Store.get('negLogoTemp', ''),
+    domicilios:  document.getElementById('domicilios').checked,
+    horario:     { ...días, apertura: document.getElementById('horaApertura').value, cierre: document.getElementById('horaCierre').value },
+    plan:        Store.get('user', {}).plan || 'ACTIVO'
+  };
+
+  Store.set('negocio', data);
+  const gal = Array.from(document.querySelectorAll('.gallery-thumb img')).map(i => i.src);
+  Store.set('gallery', gal);
+  saveNegocioToStore({ ...data, galeria: gal, promos: Store.get('promos', []) });
+  showToast('¡Negocio guardado correctamente ✓', 'success');
+}
+
+function publicarNegocio() {
+  const nombre = document.getElementById('negNombre').value.trim();
+  if (!nombre) { showToast('El nombre del negocio es obligatorio para publicar.', 'error'); return; }
+
+  guardarNegocio();
+  const url = buildNegocioURL(nombre);
+
+  // Update persistent card below the button
+  const linkCard = document.getElementById('linkCard');
+  const linkEl   = document.getElementById('panelLinkUrl');
+  const anchor   = document.getElementById('panelLinkAnchor');
+  if (linkEl)   linkEl.textContent = url;
+  if (anchor)   anchor.href = url;
+  if (linkCard) linkCard.style.display = 'block';
+
+  // Show prominent modal immediately
+  document.getElementById('modalLinkUrl').textContent  = url;
+  document.getElementById('modalLinkAnchor').href      = url;
+  document.getElementById('publishModal').style.display = 'flex';
+}
+
+function closePublishModal() {
+  document.getElementById('publishModal').style.display = 'none';
+}
+
+// Close modal on backdrop click
+document.getElementById('publishModal').addEventListener('click', function(e) {
+  if (e.target === this) closePublishModal();
+});
+
+function copyModalLink() {
+  const url = document.getElementById('modalLinkUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyModalBtn');
+    if (btn) { btn.innerHTML = '✓ &nbsp;¡Enlace copiado!'; btn.style.background = '#2ECC71'; }
+    setTimeout(() => {
+      if (btn) { btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar enlace'; btn.style.background = 'var(--gold)'; }
+    }, 2500);
+    showToast('¡Enlace copiado al portapapeles! ✓', 'success');
+  }).catch(() => showToast('Copia manualmente: ' + url, 'info', 6000));
+}
+
+function copyPanelLink() {
+  const url = document.getElementById('panelLinkUrl')?.textContent;
+  if (!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('¡Enlace copiado! ✓', 'success');
+    const btn = document.getElementById('copyPanelBtn');
+    if (btn) { btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  }).catch(() => showToast('Copia manualmente: ' + url, 'info', 6000));
+}
+
+// ── Promociones ───────────────────────────────────────────────
+function togglePromoForm() {
+  const fc = document.getElementById('promoFormCard');
+  fc.classList.toggle('show');
+  if (fc.classList.contains('show')) fc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('promoImgInput').addEventListener('change', function() {
+  if (window.CEBApi && typeof window.CEBApi.getToken === 'function' && window.CEBApi.getToken()) {
+    return; // El flujo real con backend lo maneja integration.js
+  }
+  const file = this.files[0]; if (!file) return;
+  const prev = document.getElementById('promoImgPreview');
+  const nameEl = document.getElementById('promoImgName');
+  previewImage(file, prev, () => {
+    prev.style.display = 'block';
+    nameEl.textContent = file.name; nameEl.style.display = 'block';
+    showToast('Imagen cargada ✓', 'success');
+  });
+});
+
+function execCmd(cmd, val) {
+  document.getElementById('promoEditor').focus();
+  document.execCommand(cmd, false, val || null);
+}
+
+function crearPromoción() {
+  const titulo  = document.getElementById('promoTitulo').value.trim();
+  const editor  = document.getElementById('promoEditor').innerHTML.trim();
+  const imgPrev = document.getElementById('promoImgPreview');
+
+  if (!titulo) { showToast('El título de la promoción es obligatorio.', 'error'); return; }
+  if (!editor || editor === '<br>') { showToast('Escribe el contenido de la promoción.', 'error'); return; }
+
+  if (!confirm('¿Está seguro de crear esta promoción? Solo puede publicar 1 semanal.')) return;
+
+  const promo = {
+    id: Date.now(), titulo, contenido: editor,
+    img: imgPrev.src && imgPrev.style.display !== 'none' ? imgPrev.src : '',
+    fecha: (window.CEBFormat && typeof window.CEBFormat.date === 'function')
+      ? window.CEBFormat.date(new Date())
+      : new Date().toLocaleDateString('es-419'),
+    estado: 'NO PUBLICADO'
+  };
+
+  const promos = Store.get('promos', []);
+  promos.unshift(promo);
+  Store.set('promos', promos);
+
+  if (document.getElementById('promoList').querySelector('div[style]')) {
+    document.getElementById('promoList').innerHTML = '';
+  }
+  renderPromoItem(promo);
+  showToast('¡Promoción creada correctamente!', 'success');
+  document.getElementById('promoTitulo').value = '';
+  document.getElementById('promoEditor').innerHTML = '';
+  imgPrev.style.display = 'none';
+  document.getElementById('promoImgName').style.display = 'none';
+  document.getElementById('promoFormCard').classList.remove('show');
+}
+
+function getPromoPrimaryImage(promo) {
+  const imgs = Array.isArray(promo && promo.images) ? promo.images : [];
+  if (imgs.length) {
+    const first = imgs[0] || {};
+    return String(first.file_path || first.path || promo.image_path || promo.img || '');
+  }
+  return String((promo && (promo.image_path || promo.img)) || '');
+}
+
+function getPromoImageCount(promo) {
+  const imgs = Array.isArray(promo && promo.images) ? promo.images : [];
+  if (imgs.length) return imgs.length;
+  return getPromoPrimaryImage(promo) ? 1 : 0;
+}
+
+function resolvePromoThumbUrl(path) {
+  const raw = String(path || '').trim();
+  if (!raw) return '';
+  if (/^(data:|blob:)/i.test(raw)) return raw;
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  const normalized = raw.startsWith('/') ? raw : ('/' + raw);
+  if (normalized.toLowerCase().startsWith('/uploads/')) {
+    const runtimeHost = (window.location && window.location.hostname) ? window.location.hostname : '127.0.0.1';
+    const apiBase = (window.CEBApi && window.CEBApi.baseUrl)
+      || localStorage.getItem('ceb_api_base')
+      || ('http://' + runtimeHost + ':8000/api/v1');
+    const origin = String(apiBase).replace(/\/?api\/v1\/?$/i, '');
+    return origin + normalized;
+  }
+  return normalized;
+}
+
+function renderPromoItem(promo) {
+  const list = document.getElementById('promoList');
+  const div = document.createElement('div');
+  const promoId = String(promo.id || '');
+  const promoIdEscaped = promoId.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const estadoRaw = String(promo.estado || '').trim().toUpperCase();
+  const isPublished = estadoRaw === 'PUBLICADO' || estadoRaw === 'PUBLISHED';
+  const estadoLabel = isPublished ? 'PUBLICADO' : (estadoRaw || 'NO PUBLICADO');
+  const primaryImage = resolvePromoThumbUrl(getPromoPrimaryImage(promo));
+  const imageCount = getPromoImageCount(promo);
+  const promoTitle = String(promo.titulo || 'Promoción').replace(/"/g, '&quot;');
+  div.className = `promo-item${isPublished?' published':''}`;
+  div.id = 'promo-' + promoId;
+  div.innerHTML = `
+    ${primaryImage
+      ? `<img class="pi-thumb" src="${primaryImage}" alt="${promoTitle}" onerror="this.style.display='none'; var fb=this.nextElementSibling; if(fb){fb.style.display='flex';}" /><div class="pi-thumb" style="display:none;align-items:center;justify-content:center;font-size:1.5rem">&#128227;</div>`
+      : `<div class="pi-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">&#128227;</div>`}
+    <div class="pi-body">
+      <div class="pi-title">${promo.titulo}</div>
+      <div class="pi-meta">Creado: ${promo.fecha} | Imagenes: ${imageCount} | Vence: - | Estado: <span class="${isPublished?'badge badge-green':'badge badge-muted'}">${estadoLabel}</span></div>
+      <div class="pi-actions">
+        ${!isPublished ? `<button class="btn btn-gold btn-sm" onclick="publicarPromo('${promoIdEscaped}')">Publicar</button>` : `<button class="btn btn-ghost btn-sm" onclick="relanzarPromo('${promoIdEscaped}')">Volver a lanzar</button>`}
+        <button class="btn btn-danger btn-sm" onclick="borrarPromo('${promoIdEscaped}')">Borrar</button>
+      </div>
+    </div>`;
+  list.prepend(div);
+}
+
+function publicarPromo(id) {
+  if (!confirm('¿Está seguro de publicar esta promoción?')) return;
+  const promos = Store.get('promos', []);
+  const p = promos.find(x => String(x.id) === String(id));
+  if (p) {
+    p.estado = 'PUBLICADO';
+    p.publicado = (window.CEBFormat && typeof window.CEBFormat.date === 'function')
+      ? window.CEBFormat.date(new Date())
+      : new Date().toLocaleDateString('es-419');
+    Store.set('promos', promos);
+  }
+  const el = document.getElementById('promo-' + String(id));
+  if (el) {
+    el.classList.add('published');
+    const badge = el.querySelector('.badge');
+    if (badge) { badge.className = 'badge badge-green'; badge.textContent = 'PUBLICADO'; }
+    const btn = el.querySelector('.btn-gold');
+    if (btn) { btn.textContent = 'Volver a lanzar'; btn.className = 'btn btn-ghost btn-sm'; btn.onclick = () => relanzarPromo(id); }
+  }
+  showToast('¡Promoción publicada! Ya es visible en la plataforma.', 'success');
+}
+
+function relanzarPromo(id) { showToast('Funcionalidad de relanzamiento disponible en la plataforma.', 'info'); }
+
+async function borrarPromo(id) {
+  if (!confirm('¿Eliminar esta promoción?')) return;
+
+  if (window.CEBApi && typeof window.CEBApi.deletePromotion === 'function' && window.CEBApi.getToken && window.CEBApi.getToken()) {
+    try {
+      await window.CEBApi.deletePromotion(id);
+      const rows = await window.CEBApi.listPromotions();
+      const mapped = (rows || []).map(function (p) {
+        const images = Array.isArray(p.images) ? p.images : [];
+        const imagePath = images.length ? String((images[0] || {}).file_path || p.image_path || '') : String(p.image_path || '');
+        return {
+          id: p.id,
+          titulo: p.title,
+          contenido: p.content_html,
+          img: imagePath || '',
+          image_path: imagePath || '',
+          images: images.map(function (img, idx) {
+            return {
+              file_path: String((img && img.file_path) || ''),
+              description: String((img && img.description) || ''),
+              position: Number((img && img.position) || idx),
+            };
+          }),
+          fecha: p.published_at || p.starts_at || '',
+          estado: (p.status || '').toUpperCase(),
+          publicado: p.published_at || '',
+        };
+      });
+      Store.set('promos', mapped);
+      const list = document.getElementById('promoList');
+      list.innerHTML = '';
+      mapped.forEach(renderPromoItem);
+      if (!mapped.length) {
+        list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:.875rem"><div style="font-size:2rem;margin-bottom:12px">📣</div>No se han creado promociones. Haz clic en "+" para crear una.</div>';
+      }
+      showToast('Promoción eliminada.', 'info');
+      return;
+    } catch (e) {
+      showToast('No se pudo eliminar en backend. Intentando local...', 'error');
+    }
+  }
+
+  const el = document.getElementById('promo-' + String(id));
+  if (el) el.remove();
+  const promos = Store.get('promos', []).filter(x => String(x.id) !== String(id));
+  Store.set('promos', promos);
+  if (!document.getElementById('promoList').children.length) {
+    document.getElementById('promoList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:.875rem"><div style="font-size:2rem;margin-bottom:12px">📣</div>No se han creado promociones. Haz clic en "+" para crear una.</div>';
+  }
+  showToast('Promoción eliminada.', 'info');
+}
+</script>
+
+<!-- ── PUBLISH SUCCESS MODAL ── -->
+<div id="publishModal" style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:900;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--dark-2);border:1px solid rgba(125,201,0,.35);border-radius:20px;padding:40px 36px;width:100%;max-width:500px;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.6)">
+    <!-- Close -->
+    <button onclick="closePublishModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.2rem;padding:4px 8px;border-radius:6px;transition:background .2s" onmouseover="this.style.background='var(--dark-3)'" onmouseout="this.style.background='none'">✕</button>
+    <!-- Icon -->
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 20px"></div>
+    <!-- Title -->
+    <h3 style="font-family:var(--font-main);font-size:1.8rem;font-weight:400;text-align:center;margin-bottom:6px;line-height:1.2">
+      ¡Negocio <em style="font-style:italic;color:var(--gold-light)">publicado!</em>
+    </h3>
+    <p style="text-align:center;color:var(--text-muted);font-size:.875rem;margin-bottom:28px;line-height:1.7">
+      Tu página ya es visible para todos los usuarios de la plataforma.<br>Copia tu enlace directo y compártelo con tus clientes.
+    </p>
+    <!-- URL box -->
+    <div style="background:var(--dark-3);border:1.5px solid rgba(125,201,0,.35);border-radius:12px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-family:var(--font-main);font-size:.65rem;color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Tu enlace directo</div>
+      <div id="modalLinkUrl" style="font-family:var(--font-main);font-size:.78rem;color:var(--text);word-break:break-all;line-height:1.6;margin-bottom:12px"></div>
+      <button onclick="copyModalLink()" id="copyModalBtn" style="width:100%;background:var(--gold);border:none;border-radius:8px;color:#0E0E0E;cursor:pointer;padding:12px;font-size:.875rem;font-weight:700;letter-spacing:.04em;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.background='var(--gold-light)'" onmouseout="this.style.background='var(--gold)'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copiar enlace
+      </button>
+    </div>
+    <!-- Actions -->
+    <div style="display:flex;gap:10px">
+      <a id="modalLinkAnchor" href="#" target="_blank" class="btn btn-outline btn-sm" style="flex:1;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ver página
+      </a>
+      <button onclick="closePublishModal()" class="btn btn-ghost btn-sm" style="flex:1">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script src="js/panel-whatsapp-module.js?v=20260320fix9"></script>
+  <script src="js/api-client.js?v=20260324fix2"></script>
+  <script src="js/integration.js?v=20260324fix2"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

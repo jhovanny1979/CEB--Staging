@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Negocio — Comercio e-Bogotá</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+
+    /* ── PAGE STRUCTURE ── */
+    body { background: var(--dark); }
+
+    .biz-page { padding-top: 68px; }
+
+    /* ── HERO HEADER ── */
+    .biz-hero {
+      position: relative;
+      background: var(--dark-2);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .biz-hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 80% at 80% 50%, rgba(201,168,76,.06) 0%, transparent 65%),
+        radial-gradient(ellipse 30% 50% at 10% 60%, rgba(201,168,76,.04) 0%, transparent 60%);
+    }
+    .biz-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 1180px; margin: 0 auto;
+      padding: 52px 5% 40px;
+      display: flex; align-items: flex-start; gap: 36px;
+    }
+
+    /* Logo */
+    .biz-logo-wrap {
+      flex-shrink: 0;
+      width: 120px; height: 120px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--dark-3);
+      border: 2px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .biz-logo-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .biz-logo-placeholder {
+      font-size: 2.8rem;
+    }
+
+    /* Info */
+    .biz-info { flex: 1; min-width: 0; }
+    .biz-cat-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .biz-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500; line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .biz-desc {
+      font-size: .92rem; color: var(--text-muted);
+      line-height: 1.75; max-width: 600px;
+      margin-bottom: 18px;
+    }
+    .biz-meta-row {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      font-size: .82rem; color: var(--text-muted);
+    }
+    .biz-meta-item { display: flex; align-items: center; gap: 6px; }
+    .biz-meta-item svg { flex-shrink: 0; opacity: .7; }
+
+    /* Status pill */
+    .biz-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .biz-status.open  { background: rgba(46,204,113,.12); color: #2ECC71; border: 1px solid rgba(46,204,113,.2); }
+    .biz-status.close { background: rgba(229,85,85,.1);   color: #E55;   border: 1px solid rgba(229,85,85,.2); }
+    .biz-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ── BODY LAYOUT ── */
+    .biz-body {
+      max-width: 1180px; margin: 0 auto;
+      padding: 40px 5% 80px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .biz-main { min-width: 0; }
+    .biz-aside { position: sticky; top: 88px; }
+
+    /* ── SECTIONS ── */
+    .biz-section { margin-bottom: 48px; }
+    .biz-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem; font-weight: 500;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .biz-section-title em { font-style: italic; color: var(--gold-light); }
+    .biz-section-count { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--text-muted); }
+
+    /* ── GALLERY ── */
+    .gallery-layout { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Featured image */
+    .gallery-featured {
+      width: 100%;
+      aspect-ratio: 16/7;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      background: var(--dark-3);
+      border: 1px solid var(--border);
+    }
+    .gallery-featured img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .4s ease;
+    }
+    .gallery-featured:hover img { transform: scale(1.03); }
+    .gallery-featured-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.35) 0%, transparent 50%);
+      opacity: 0; transition: opacity .3s;
+      display: flex; align-items: flex-end; padding: 18px;
+    }
+    .gallery-featured:hover .gallery-featured-overlay { opacity: 1; }
+    .gfo-text { color: white; font-size: .78rem; letter-spacing: .06em; }
+
+    /* Thumbs strip */
+    .gallery-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+      gap: 8px;
+    }
+    .gallery-strip-thumb {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color .2s, transform .15s;
+      background: var(--dark-3);
+    }
+    .gallery-strip-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gallery-strip-thumb:hover { transform: scale(1.04); }
+    .gallery-strip-thumb.active { border-color: var(--gold); }
+
+    /* Empty gallery */
+    .gallery-empty {
+      aspect-ratio: 16/7;
+      border-radius: var(--radius-lg);
+      border: 1.5px dashed var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; color: var(--text-muted); font-size: .85rem;
+    }
+    .gallery-empty .ge-icon { font-size: 2.5rem; }
+
+    /* ── PROMOTIONS ── */
+    .promo-cards { display: flex; flex-direction: column; gap: 16px; }
+    .promo-card {
+      background: var(--dark-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      transition: border-color .2s, transform .2s;
+    }
+    .promo-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+    .promo-card-img {
+      width: 180px; flex-shrink: 0;
+      object-fit: cover;
+      display: block;
+    }
+    .promo-card-img-placeholder {
+      width: 180px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--dark-3), var(--dark-4));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+    }
+    .promo-card-body {
+      padding: 22px 24px;
+      flex: 1; min-width: 0;
+    }
+    .promo-card-date {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem; color: var(--gold);
+      letter-spacing: .14em; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .promo-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem; font-weight: 600;
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .promo-card-content {
+      font-size: .875rem; color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .promo-card-content b, .promo-card-content strong { color: var(--text); }
+
+    /* Empty promos */
+    .promo-empty {
+      padding: 40px; text-align: center;
+      border: 1px dashed var(--border); border-radius: var(--radius);
+      color: var(--text-muted); font-size: .875rem;
+    }
+
+    /* ── ASIDE CARD ── */
+    .aside-card {
+      background: var(--dark-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .aside-card-title {
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    /* Contact rows */
+    .contact-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: .85rem; color: var(--text-muted);
+    }
+    .contact-row:last-child { border-bottom: none; }
+    .contact-row .cr-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--dark-3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; }
+    .contact-row a { color: var(--text-muted); text-decoration: none; transition: color .2s; }
+    .contact-row a:hover { color: var(--gold-light); }
+
+    /* Hours */
+    .hours-table { width: 100%; font-size: .82rem; }
+    .hours-table tr td { padding: 5px 0; }
+    .hours-table tr td:first-child { color: var(--text-muted); width: 50%; }
+    .hours-table tr td:last-child { font-weight: 500; text-align: right; }
+    .hours-table .today { color: var(--gold); font-weight: 700; }
+    .hours-closed { color: var(--text-muted) !important; font-style: italic; }
+
+    /* Social buttons */
+    .social-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .social-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 14px; border-radius: 8px;
+      border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none;
+      font-size: .8rem; font-weight: 500;
+      transition: all .2s;
+    }
+    .social-btn:hover { border-color: var(--gold-dim); color: var(--gold-light); background: rgba(201,168,76,.05); }
+    .social-btn svg { flex-shrink: 0; }
+
+    /* WhatsApp contact btn */
+    .wa-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: #25D366; color: white;
+      padding: 13px 20px; border-radius: 10px;
+      text-decoration: none; font-weight: 600; font-size: .9rem;
+      transition: all .2s; margin-top: 12px;
+      box-shadow: 0 4px 16px rgba(37,211,102,.25);
+    }
+    .wa-btn:hover { background: #1ebe5a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,211,102,.35); }
+
+    /* Direct link box */
+    .link-box {
+      background: var(--dark-3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .link-url {
+      flex: 1; font-family: 'DM Mono', monospace;
+      font-size: .7rem; color: var(--gold);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .copy-btn {
+      flex-shrink: 0;
+      background: rgba(201,168,76,.1);
+      border: 1px solid var(--border);
+      border-radius: 6px; color: var(--gold);
+      cursor: pointer; padding: 4px 10px;
+      font-size: .72rem; font-weight: 600;
+      transition: background .2s;
+    }
+    .copy-btn:hover { background: rgba(201,168,76,.2); }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 9000;
+      background: rgba(0,0,0,.92);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw; max-height: 88vh;
+      border-radius: 12px; object-fit: contain;
+      box-shadow: 0 20px 80px rgba(0,0,0,.6);
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 24px;
+      background: rgba(255,255,255,.12); border: none;
+      color: white; font-size: 1.3rem; cursor: pointer;
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 1;
+    }
+    .lb-close:hover { background: rgba(255,255,255,.25); }
+    .lb-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.12); border: none;
+      color: white; font-size: 1.2rem; cursor: pointer;
+      width: 46px; height: 46px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 1;
+    }
+    .lb-nav:hover { background: rgba(255,255,255,.25); }
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
+    .lb-counter {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.5); color: white;
+      padding: 5px 16px; border-radius: 20px;
+      font-size: .75rem; font-family: 'DM Mono', monospace;
+    }
+
+    /* ── NOT FOUND ── */
+    .not-found {
+      min-height: 80vh; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; gap: 16px;
+      padding: 40px;
+    }
+    .not-found h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; }
+    .not-found h2 em { font-style: italic; color: var(--gold-light); }
+    .not-found p { color: var(--text-muted); max-width: 400px; line-height: 1.7; }
+
+    /* ── DELIVERY TAG ── */
+    .delivery-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(201,168,76,.08); border: 1px solid var(--border);
+      color: var(--gold-light); padding: 4px 12px; border-radius: 20px;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .biz-body { grid-template-columns: 1fr; }
+      .biz-aside { position: static; }
+      .biz-hero-inner { flex-direction: column; align-items: center; text-align: center; }
+      .biz-cat-row { justify-content: center; }
+      .biz-meta-row { justify-content: center; }
+      .promo-card { flex-direction: column; }
+      .promo-card-img, .promo-card-img-placeholder { width: 100%; height: 200px; }
+    }
+    @media (max-width: 600px) {
+      .biz-logo-wrap { width: 90px; height: 90px; border-radius: 16px; }
+      .gallery-strip { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <a href="index.html" class="nav-logo">
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none">
+      <circle cx="40" cy="40" r="36" stroke="#C9A84C" stroke-width="2.5"/>
+      <path d="M18 40 Q40 14 62 40" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M20 41 Q40 66 60 41" stroke="#C9A84C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="40" r="3.5" fill="#C9A84C"/>
+    </svg>
+    <span class="nav-brand">Comercio <em>e·Bogotá</em></span>
+  </a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="panel.html" class="nav-btn">Ya soy cliente</a></li>
+  </ul>
+</nav>
+
+<!-- ── BUSINESS PAGE (rendered by JS) ── -->
+<div class="biz-page" id="bizPage"></div>
+
+<!-- ── LIGHTBOX ── -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-nav lb-prev" onclick="lbNavigate(-1)">‹</button>
+  <img id="lbImg" src="" alt="" />
+  <button class="lb-nav lb-next" onclick="lbNavigate(1)">›</button>
+  <div class="lb-counter" id="lbCounter">1 / 1</div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────
+// DEMO DATA — shown when no localStorage match is found
+// ─────────────────────────────────────────────────────────────
+const DEMO_NEGOCIOS = {
+  'panaderia-san-jose': {
+    nombre: 'Panadería San José',
+    slug: 'panaderia-san-jose',
+    categoria: 'Panaderías',
+    localidad: 'Kennedy',
+    direccion: 'Cll 38A Sur 79 12',
+    descripcion: 'Panadería artesanal con más de 20 años elaborando pan fresco cada mañana. Ofrecemos pan tradicional, tortas personalizadas, pasteles y productos de repostería para toda ocasión.',
+    whatsapp: '3101234567',
+    horario: { L:true, M:true, X:true, J:true, V:true, S:true, D:false, apertura:'06:00', cierre:'19:00' },
+    domicilios: true,
+    redes: { instagram: '@panaderiasanjose', facebook: 'Panadería San José' },
+    publicado: true,
+    logo: '',
+    galeria: [],
+    plan: 'PLAN 3 MESES'
+  },
+  'ferreteria-el-perno': {
+    nombre: 'Ferretería El Perno',
+    slug: 'ferreteria-el-perno',
+    categoria: 'Ferreterías',
+    localidad: 'Puente Aranda',
+    direccion: 'CR 50 13 21',
+    descripcion: 'Distribuidores de materiales de construcción, herrajes, pinturas, herramientas eléctricas y manuales. Atención personalizada y precios al por mayor y por menor.',
+    whatsapp: '3209876543',
+    horario: { L:true, M:true, X:true, J:true, V:true, S:true, D:false, apertura:'07:30', cierre:'18:00' },
+    domicilios: false,
+    redes: {},
+    publicado: true,
+    logo: '',
+    galeria: [],
+    plan: 'PLAN 6 MESES'
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// URL / SLUG helpers
+// ─────────────────────────────────────────────────────────────
+function slugify(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function getEmpresaSlug() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('empresa') || params.get('e') || '';
+}
+
+function buildLink(slug) {
+  const base = window.location.href.split('?')[0];
+  return `${base}?empresa=${slug}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOAD BUSINESS DATA
+// ─────────────────────────────────────────────────────────────
+function loadNegocio(slug) {
+  // 1) Check localStorage (real registered businesses)
+  const allNegocios = Store.get('negocios', {});
+  if (allNegocios[slug]) return allNegocios[slug];
+
+  // 2) Check current session negocio (if user is editing their own page)
+  const currentNeg = Store.get('negocio', null);
+  if (currentNeg && slugify(currentNeg.nombre || '') === slug) {
+    return buildNegocioFromSession(currentNeg, slug);
+  }
+
+  // 3) Demo data
+  if (DEMO_NEGOCIOS[slug]) return DEMO_NEGOCIOS[slug];
+
+  return null;
+}
+
+function buildNegocioFromSession(data, slug) {
+  const promos = Store.get('promos', []);
+  const galeria = Store.get('gallery', []);
+  return {
+    nombre:      data.nombre || 'Mi Negocio',
+    slug,
+    categoria:   data.categoria || '',
+    localidad:   data.localidad || '',
+    direccion:   data.dir || data.direccion || '',
+    descripcion: data.descripcion || '',
+    whatsapp:    data.wp || data.whatsapp || '',
+    horario:     data.horario || { L:true,M:true,X:true,J:true,V:true,S:false,D:false,apertura:'08:00',cierre:'18:00' },
+    domicilios:  !!data.domicilios,
+    redes:       { instagram: data.instagram||'', facebook: data.facebook||'', youtube: data.youtube||'' },
+    publicado:   true,
+    logo:        data.logo || Store.get('negLogoTemp',''),
+    galeria,
+    promos,
+    plan:        Store.get('user',{}).plan || 'GRATIS'
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────
+let lbImages = [];
+let lbIndex = 0;
+
+function renderPage(neg) {
+  const link = buildLink(neg.slug);
+  const isOpen = checkIsOpen(neg.horario);
+  const horarioHTML = buildHorarioHTML(neg.horario);
+  const promos = neg.promos || Store.get('promos', []).filter(p => p.estado === 'PUBLICADO');
+  const galeria = neg.galeria || [];
+
+  // Collect images for lightbox
+  lbImages = galeria;
+
+  const logoHTML = neg.logo
+    ? `<img src="${neg.logo}" alt="${neg.nombre}" />`
+    : `<div class="biz-logo-placeholder">${getCategoryEmoji(neg.categoria)}</div>`;
+
+  const galleryHTML = buildGalleryHTML(galeria);
+  const promosHTML  = buildPromosHTML(promos);
+  const redesHTML   = buildRedesHTML(neg.redes);
+
+  document.title = `${neg.nombre} — Comercio e-Bogotá`;
+
+  document.getElementById('bizPage').innerHTML = `
+
+    <!-- HERO -->
+    <div class="biz-hero">
+      <div class="biz-hero-bg"></div>
+      <div class="biz-hero-inner">
+        <div class="biz-logo-wrap">${logoHTML}</div>
+        <div class="biz-info">
+          <div class="biz-cat-row">
+            ${neg.categoria ? `<span class="badge badge-gold">${neg.categoria}</span>` : ''}
+            ${neg.localidad ? `<span class="badge badge-muted">📍 ${neg.localidad}</span>` : ''}
+            ${neg.domicilios ? `<span class="delivery-tag">🛵 Con domicilios</span>` : ''}
+            <span class="biz-status ${isOpen?'open':'close'}">${isOpen?'Abierto ahora':'Cerrado ahora'}</span>
+          </div>
+          <h1 class="biz-name">${neg.nombre}</h1>
+          ${neg.descripcion ? `<p class="biz-desc">${neg.descripcion}</p>` : ''}
+          <div class="biz-meta-row">
+            ${neg.direccion ? `<div class="biz-meta-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${neg.direccion}</div>` : ''}
+            ${neg.horario ? `<div class="biz-meta-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${neg.horario.apertura || '—'} – ${neg.horario.cierre || '—'}</div>` : ''}
+            <div class="biz-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <span class="badge badge-gold" style="font-size:.65rem;padding:2px 8px">${neg.plan||'ACTIVO'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="biz-body">
+
+      <!-- MAIN -->
+      <div class="biz-main">
+
+        <!-- GALLERY -->
+        <div class="biz-section reveal">
+          <div class="biz-section-title">
+            <span>Imágenes del <em>negocio</em></span>
+            ${galeria.length ? `<span class="biz-section-count">${galeria.length} / 10 imágenes</span>` : ''}
+          </div>
+          ${galleryHTML}
+        </div>
+
+        <!-- PROMOTIONS -->
+        <div class="biz-section reveal">
+          <div class="biz-section-title">
+            <span><em>Promociones</em> activas</span>
+            ${promos.length ? `<span class="biz-section-count">${promos.length} esta semana</span>` : ''}
+          </div>
+          ${promosHTML}
+        </div>
+
+      </div>
+
+      <!-- ASIDE -->
+      <div class="biz-aside">
+
+        <!-- Contact -->
+        <div class="aside-card reveal">
+          <div class="aside-card-title">Contacto</div>
+          ${neg.whatsapp ? `
+            <div class="contact-row">
+              <div class="cr-icon">📱</div>
+              <span>${neg.whatsapp}</span>
+            </div>
+            <a class="wa-btn" href="https://wa.me/57${neg.whatsapp.replace(/\D/g,'')}" target="_blank">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.372 0 12c0 2.116.553 4.103 1.522 5.83L.044 23.95l6.263-1.643A11.954 11.954 0 0012 24c6.628 0 12-5.372 12-12S18.627 0 12 0zM12 22c-1.84 0-3.57-.497-5.063-1.364l-.363-.214-3.718.975.99-3.63-.237-.374A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              Contactar por WhatsApp
+            </a>` : '<div class="contact-row"><span style="color:var(--text-muted);font-size:.85rem">Sin contacto registrado</span></div>'}
+          ${neg.direccion ? `<div class="contact-row"><div class="cr-icon">📍</div><span>${neg.direccion}${neg.localidad?', '+neg.localidad:''}</span></div>` : ''}
+        </div>
+
+        <!-- Hours -->
+        ${neg.horario ? `
+        <div class="aside-card reveal d1">
+          <div class="aside-card-title">Horario de atención</div>
+          ${horarioHTML}
+        </div>` : ''}
+
+        <!-- Social -->
+        ${redesHTML ? `
+        <div class="aside-card reveal d2">
+          <div class="aside-card-title">Redes sociales</div>
+          <div class="social-btns">${redesHTML}</div>
+        </div>` : ''}
+
+        <!-- Direct link -->
+        <div class="aside-card reveal d3">
+          <div class="aside-card-title">Enlace directo de este negocio</div>
+          <div class="link-box" id="linkBox">
+            <span class="link-url" id="linkUrl">${link}</span>
+            <button class="copy-btn" onclick="copyLink()">Copiar</button>
+          </div>
+          <p style="font-size:.72rem;color:var(--text-muted);margin-top:8px;line-height:1.6">
+            Comparte este link con tus clientes para que lleguen directamente a tu página.
+          </p>
+        </div>
+
+        <!-- Back link -->
+        <div style="text-align:center;margin-top:4px">
+          <a href="index.html" style="font-size:.78rem;color:var(--text-muted);text-decoration:none">← Volver a Comercio e-Bogotá</a>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  // Init strip interaction
+  initGalleryStrip();
+  initReveal();
+}
+
+// ─────────────────────────────────────────────────────────────
+// GALLERY
+// ─────────────────────────────────────────────────────────────
+function buildGalleryHTML(galeria) {
+  if (!galeria.length) {
+    return `<div class="gallery-empty"><div class="ge-icon">📷</div><div>Este negocio aún no ha subido imágenes de sus productos o servicios.</div></div>`;
+  }
+  const featured = galeria[0];
+  const extras   = galeria.slice(1);
+  return `
+    <div class="gallery-layout">
+      <div class="gallery-featured" onclick="openLightbox(0)">
+        <img id="galleryFeatured" src="${featured}" alt="Imagen principal" />
+        <div class="gallery-featured-overlay"><span class="gfo-text">Ver galería completa →</span></div>
+      </div>
+      ${extras.length ? `
+      <div class="gallery-strip" id="galleryStrip">
+        <div class="gallery-strip-thumb active" data-index="0" onclick="setFeatured(0)">
+          <img src="${featured}" alt="Imagen 1" />
+        </div>
+        ${extras.map((src,i)=>`<div class="gallery-strip-thumb" data-index="${i+1}" onclick="setFeatured(${i+1})"><img src="${src}" alt="Imagen ${i+2}" /></div>`).join('')}
+      </div>` : ''}
+    </div>`;
+}
+
+function initGalleryStrip() {
+  // Already handled by inline onclick
+}
+
+function setFeatured(index) {
+  const featured = document.getElementById('galleryFeatured');
+  if (!featured || !lbImages[index]) return;
+  featured.src = lbImages[index];
+  featured.closest('.gallery-featured').onclick = () => openLightbox(index);
+  document.querySelectorAll('.gallery-strip-thumb').forEach(t => {
+    t.classList.toggle('active', +t.dataset.index === index);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROMOTIONS
+// ─────────────────────────────────────────────────────────────
+function buildPromosHTML(promos) {
+  const active = Array.isArray(promos) ? promos.filter(p => p.estado === 'PUBLICADO' || p.publicado) : [];
+  if (!active.length) {
+    return `<div class="promo-empty"><div style="font-size:1.8rem;margin-bottom:10px">📣</div>Este negocio no tiene promociones activas esta semana.<br><small>¡Vuelve pronto para descubrir sus ofertas!</small></div>`;
+  }
+  return `<div class="promo-cards">${active.map(p => `
+    <div class="promo-card">
+      ${p.img
+        ? `<img class="promo-card-img" src="${p.img}" alt="${p.titulo}" />`
+        : `<div class="promo-card-img-placeholder">🏷️</div>`}
+      <div class="promo-card-body">
+        <div class="promo-card-date">✦ PROMOCIÓN ACTIVA · ${p.publicado||p.fecha||''}</div>
+        <div class="promo-card-title">${p.titulo}</div>
+        <div class="promo-card-content">${p.contenido||''}</div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// HOURS
+// ─────────────────────────────────────────────────────────────
+const DAY_NAMES = { L:'Lunes', M:'Martes', X:'Miércoles', J:'Jueves', V:'Viernes', S:'Sábado', D:'Domingo' };
+const DAY_JS = [null,'D','L','M','X','J','V','S']; // JS getDay(): 0=Sun
+
+function checkIsOpen(horario) {
+  if (!horario) return false;
+  const now = new Date();
+  const day = DAY_JS[now.getDay()];
+  if (!horario[day]) return false;
+  const [oh,om] = (horario.apertura||'08:00').split(':').map(Number);
+  const [ch,cm] = (horario.cierre||'18:00').split(':').map(Number);
+  const cur = now.getHours()*60+now.getMinutes();
+  return cur >= oh*60+om && cur <= ch*60+cm;
+}
+
+function buildHorarioHTML(horario) {
+  if (!horario) return '';
+  const now = new Date();
+  const todayKey = DAY_JS[now.getDay()];
+  const rows = Object.entries(DAY_NAMES).map(([k,name]) => {
+    const isToday = k === todayKey;
+    const open    = horario[k];
+    return `<tr class="${isToday?'today':''}">
+      <td>${name}${isToday?' <em style="font-size:.68rem;color:var(--gold)">(hoy)</em>':''}</td>
+      <td class="${open?'':'hours-closed'}">${open?(horario.apertura+' – '+horario.cierre):'Cerrado'}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="hours-table"><tbody>${rows}</tbody></table>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// SOCIAL
+// ─────────────────────────────────────────────────────────────
+function buildRedesHTML(redes) {
+  if (!redes) return '';
+  const btns = [];
+  if (redes.instagram) btns.push(`<a class="social-btn" href="https://instagram.com/${redes.instagram.replace('@','')}" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> Instagram</a>`);
+  if (redes.facebook) btns.push(`<a class="social-btn" href="${redes.facebook.startsWith('http')?redes.facebook:'https://facebook.com/'}" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg> Facebook</a>`);
+  if (redes.youtube) btns.push(`<a class="social-btn" href="${redes.youtube}" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg> YouTube</a>`);
+  return btns.join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// EMOJIS PER CATEGORY
+// ─────────────────────────────────────────────────────────────
+function getCategoryEmoji(cat) {
+  const map = { 'Panaderías':'🥖','Ferreterías':'🔧','Restaurantes':'🍽️','Peluquerías':'✂️','Droguerías':'💊','Veterinarias':'🐾','Floristerías':'🌸','Barberías':'💈','Talleres mecánicos':'🔩','Fruterías y verduras':'🥦','Almacenes de ropa':'👗','Almacenes de calzado':'👟' };
+  return map[cat] || '🏪';
+}
+
+// ─────────────────────────────────────────────────────────────
+// COPY LINK
+// ─────────────────────────────────────────────────────────────
+function copyLink() {
+  const url = document.getElementById('linkUrl')?.textContent;
+  if (!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('¡Enlace copiado al portapapeles! ✓', 'success');
+    const btn = document.querySelector('.copy-btn');
+    if (btn) { btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  }).catch(() => {
+    showToast('Copia manualmente: ' + url, 'info', 5000);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// LIGHTBOX
+// ─────────────────────────────────────────────────────────────
+function openLightbox(index) {
+  if (!lbImages.length) return;
+  lbIndex = index;
+  document.getElementById('lbImg').src = lbImages[lbIndex];
+  document.getElementById('lbCounter').textContent = `${lbIndex+1} / ${lbImages.length}`;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lbNavigate(dir) {
+  lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+  document.getElementById('lbImg').src = lbImages[lbIndex];
+  document.getElementById('lbCounter').textContent = `${lbIndex+1} / ${lbImages.length}`;
+}
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if (e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowRight') lbNavigate(1);
+  if (e.key === 'ArrowLeft')  lbNavigate(-1);
+});
+
+// ─────────────────────────────────────────────────────────────
+// NOT FOUND
+// ─────────────────────────────────────────────────────────────
+function renderNotFound(slug) {
+  document.getElementById('bizPage').innerHTML = `
+    <div class="not-found">
+      <div style="font-size:3rem">🔍</div>
+      <h2>Negocio <em>no encontrado</em></h2>
+      <p>No encontramos un negocio registrado con el identificador <code>${slug}</code>. Verifica el enlace o busca el negocio desde la página principal.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+        <a href="index.html" class="btn btn-gold">Ir a la plataforma</a>
+        <a href="panel.html" class="btn btn-outline">Soy el propietario →</a>
+      </div>
+      <div style="margin-top:32px;padding:20px;background:var(--dark-2);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:480px;text-align:left">
+        <div class="eyebrow" style="margin-bottom:10px">Prueba estos negocios demo</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="negocio.html?empresa=panaderia-san-jose" style="color:var(--gold);text-decoration:none;font-size:.85rem">🥖 Panadería San José (Kennedy)</a>
+          <a href="negocio.html?empresa=ferreteria-el-perno" style="color:var(--gold);text-decoration:none;font-size:.85rem">🔧 Ferretería El Perno (Puente Aranda)</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const slug = getEmpresaSlug();
+  if (!slug) {
+    // No slug — show directory of all businesses
+    renderDirectory();
+    return;
+  }
+  const neg = loadNegocio(slug);
+  if (neg) renderPage(neg);
+  else renderNotFound(slug);
+});
+
+function renderDirectory() {
+  const all = Store.get('negocios', {});
+  const demos = Object.values(DEMO_NEGOCIOS);
+  const stored = Object.values(all);
+  const combined = [...stored, ...demos];
+
+  document.title = 'Directorio — Comercio e-Bogotá';
+  document.getElementById('bizPage').innerHTML = `
+    <div style="max-width:1100px;margin:0 auto;padding:60px 5% 80px">
+      <div class="eyebrow" style="margin-bottom:12px">Directorio</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:400;margin-bottom:8px">Negocios en <em style="font-style:italic;color:var(--gold-light)">Bogotá</em></h1>
+      <p style="color:var(--text-muted);margin-bottom:40px;font-size:.9rem">Encuentra comercios, tiendas y servicios locales en tu ciudad.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        ${combined.map(n=>`
+        <a href="negocio.html?empresa=${n.slug}" style="text-decoration:none">
+          <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;transition:border-color .2s,transform .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--gold-dim)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+            <div style="width:52px;height:52px;border-radius:12px;background:var(--dark-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">${n.logo?`<img src="${n.logo}" style="width:100%;height:100%;object-fit:cover" />`:`${getCategoryEmoji(n.categoria)}`}</div>
+            <div style="min-width:0">
+              <div style="font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.nombre}</div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-top:2px">${n.categoria||''} · ${n.localidad||''}</div>
+              <div style="font-size:.7rem;color:var(--gold);font-family:'DM Mono',monospace;margin-top:4px">${n.slug}</div>
+            </div>
+          </div>
+        </a>`).join('')}
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>

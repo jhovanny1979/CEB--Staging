@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<script>
+if (location.protocol === 'file:') {
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const storedHost = localStorage.getItem('ceb_front_host') || '127.0.0.1';
+  const target = 'http://' + storedHost + ':5500/' + page + location.search + location.hash;
+  location.replace(target);
+}
+</script>
+
+<title>Comercio e-Bogotá</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,700;0,800;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;}
+:root{
+  --green:#7dc900;--green2:#8fe000;--gt:#2d6200;--gm:#4a8f00;
+  --gl:#edfacc;--gb:#b8e870;
+  --w:#fff;--g1:#f8f8f8;--g2:#f0f0f0;--g3:#e8e8e8;--g4:#d0d0d0;--g5:#555;
+  --text:#111;--s:80px;--b:40px;--c:24px;
+  --title:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+
+/* NAV */
+nav{background:var(--w);border-bottom:1.5px solid var(--g4);padding:0 56px;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,.06);}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:var(--title);font-weight:800;font-size:18px;color:var(--text);}
+.logo-text span{color:var(--gt);}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{color:var(--g5);font-size:13px;text-decoration:none;font-weight:500;transition:color .15s;}
+.nav-links a:hover{color:var(--text);}
+.btn-reg{background:transparent;color:var(--g5);border:none;font-weight:500;font-size:13px;cursor:pointer;}
+.btn-client{background:var(--green);color:#111;border:1.5px solid var(--green2);border-radius:8px;padding:10px 22px;font-family:var(--title);font-weight:700;font-size:13px;cursor:pointer;}
+.btn-client:hover{background:var(--green2);}
+
+/* HERO */
+.hero{background:var(--w);padding:var(--s) 56px;}
+.hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--gl);border:1px solid var(--gb);border-radius:20px;padding:5px 14px;margin-bottom:var(--c);}
+.eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.eyebrow-text{font-size:11.5px;color:var(--gt);font-weight:700;letter-spacing:.5px;}
+h1{font-family:var(--title);font-size:58px;font-weight:800;line-height:1.08;color:var(--text);margin-bottom:20px;letter-spacing:-2px;}
+h1 em{font-style:italic;color:var(--gt);font-weight:300;}
+.hero-sub{color:var(--g5);font-size:17px;line-height:1.8;margin-bottom:var(--b);max-width:480px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:var(--b);}
+.btn-primary{background:var(--green);color:#111;border:1.5px solid var(--green2);border-radius:10px;padding:16px 32px;font-family:var(--title);font-weight:700;font-size:16px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:9px;box-shadow:0 4px 16px rgba(125,201,0,.3);}
+.btn-primary:hover{background:var(--green2);transform:translateY(-2px);}
+.btn-outline{background:var(--w);color:var(--text);border:1.5px solid var(--g4);border-radius:10px;padding:15px 26px;font-weight:500;font-size:15px;cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:var(--g5);}
+.trust-row{display:flex;gap:20px;padding-top:var(--c);border-top:1px solid var(--g3);}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--g5);}
+.trust-check{width:18px;height:18px;border-radius:50%;background:var(--gl);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* HERO ILLUSTRATION */
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;}
+.hero-visual svg{width:100%;max-width:480px;height:auto;}
+.float-chip{position:absolute;background:var(--w);border:1.5px solid var(--g4);border-radius:12px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.chip-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.fc1{top:10%;right:-10px;animation:fl 3.5s ease-in-out infinite;}
+.fc2{bottom:15%;left:-10px;animation:fl 3.5s ease-in-out infinite 1s;}
+@keyframes fl{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* STATS */
+.stats-bar{background:var(--green);padding:var(--b) 56px;}
+.stats-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.stat-item{text-align:center;padding:0 20px;border-right:1px solid rgba(0,0,0,.12);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:var(--title);font-size:34px;font-weight:800;color:#111;line-height:1;letter-spacing:-1px;}
+.stat-lbl{font-size:12px;color:var(--gt);margin-top:6px;font-weight:600;}
+
+/* FEATURES */
+.features{padding:var(--s) 56px;background:var(--g2);}
+.features-inner,.how-inner,.testi-inner,.pricing-inner,.faq-inner{max-width:1140px;margin:0 auto;}
+.sec-tag-wrap{margin-bottom:12px;}
+.sec-tag{display:inline-block;background:var(--gl);color:var(--gt);border:1px solid var(--gb);border-radius:5px;padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;}
+h2{font-family:var(--title);font-size:42px;font-weight:800;color:var(--text);margin-bottom:12px;letter-spacing:-1.5px;line-height:1.15;}
+h2 em{font-style:italic;color:var(--gt);font-weight:300;}
+.sec-sub{color:var(--g5);font-size:16px;margin-bottom:var(--b);max-width:520px;line-height:1.75;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--g4);border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;}
+.feat-card{background:var(--w);padding:var(--c);transition:background .2s;}
+.feat-card:hover{background:#f5ffe0;}
+.feat-icon{width:56px;height:56px;border-radius:14px;background:var(--gl);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feat-title{font-family:var(--title);font-weight:700;font-size:15px;color:var(--text);margin-bottom:8px;}
+.feat-desc{color:var(--g5);font-size:14px;line-height:1.7;}
+
+/* HOW */
+.how{padding:var(--s) 56px;background:var(--w);}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:var(--b);}
+.step{background:var(--g1);border:1.5px solid var(--g4);border-radius:14px;padding:var(--c);transition:all .2s;position:relative;}
+.step:hover{border-color:var(--green);background:#f8ffe8;transform:translateY(-3px);box-shadow:0 8px 24px rgba(125,201,0,.12);}
+.step-num{width:52px;height:52px;border-radius:12px;border:2px solid var(--green);color:var(--gt);display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--gl);}
+.step-title{font-family:var(--title);font-weight:700;font-size:14.5px;color:var(--text);margin-bottom:8px;}
+.step-desc{color:var(--g5);font-size:13.5px;line-height:1.65;}
+.step-arr{position:absolute;top:34px;right:-11px;width:22px;height:22px;background:var(--w);border:1.5px solid var(--g4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gt);z-index:1;font-weight:700;}
+.step:last-child .step-arr{display:none;}
+
+/* TESTI */
+.testi{padding:var(--s) 56px;background:var(--g2);}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:var(--b);}
+.testi-card{background:var(--w);border:1.5px solid var(--g4);border-radius:14px;padding:var(--c);transition:all .2s;}
+.testi-card:hover{border-color:var(--green);}
+.testi-stars{color:var(--gm);font-size:15px;margin-bottom:14px;letter-spacing:3px;}
+.testi-text{color:var(--g5);font-size:14.5px;line-height:1.75;margin-bottom:var(--c);font-style:italic;}
+.testi-author{display:flex;align-items:center;gap:12px;}
+.testi-av{width:40px;height:40px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#111;font-family:var(--title);font-weight:700;font-size:15px;flex-shrink:0;}
+.testi-name{font-family:var(--title);font-weight:700;font-size:13.5px;color:var(--text);}
+.testi-biz{font-size:11.5px;color:#aaa;margin-top:2px;}
+
+/* PRICING */
+.pricing{padding:var(--s) 56px;background:var(--w);border-top:1px solid var(--g3);}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:var(--b);}
+.plan-card{background:var(--g1);border:1.5px solid var(--g4);border-radius:16px;padding:28px;position:relative;transition:all .2s;}
+.plan-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08);}
+.plan-card.featured{background:var(--w);border:2.5px solid var(--green);box-shadow:0 8px 32px rgba(125,201,0,.15);}
+.plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--green);color:#111;font-family:var(--title);font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;white-space:nowrap;}
+.plan-badge-trial{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gt);color:#fff;font-family:var(--title);font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;white-space:nowrap;}
+.plan-name{font-family:var(--title);font-size:12px;font-weight:700;color:var(--gt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.plan-price{font-family:var(--title);font-size:38px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-1.5px;margin-bottom:4px;}
+.plan-price span{font-size:15px;font-weight:500;color:var(--g5);letter-spacing:0;}
+.plan-period{font-size:13px;color:var(--g5);margin-bottom:var(--c);padding-bottom:var(--c);border-bottom:1px solid var(--g4);}
+.plan-note{font-size:11.5px;color:var(--gt);background:var(--gl);border:1px solid var(--gb);border-radius:6px;padding:6px 10px;margin-bottom:14px;font-weight:500;}
+.plan-features{display:flex;flex-direction:column;gap:9px;margin-bottom:var(--c);}
+.plan-feat{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--g5);}
+.pfc{width:17px;height:17px;border-radius:50%;background:var(--gl);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btn-plan{width:100%;background:var(--green);color:#111;border:1.5px solid var(--green2);border-radius:9px;padding:13px;font-family:var(--title);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;}
+.btn-plan:hover{background:var(--green2);}
+.btn-plan-out{width:100%;background:transparent;color:var(--text);border:1.5px solid var(--g4);border-radius:9px;padding:13px;font-family:var(--title);font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;}
+.btn-plan-out:hover{border-color:var(--g5);}
+
+/* FAQ */
+.faq{padding:var(--s) 56px;background:var(--g2);border-top:1px solid var(--g3);}
+.faq-list{display:flex;flex-direction:column;gap:0;margin-top:var(--b);border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;}
+.faq-item{background:var(--w);border-bottom:1px solid var(--g4);}
+.faq-item:last-child{border-bottom:none;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px var(--c);cursor:pointer;transition:background .15s;gap:16px;}
+.faq-q:hover{background:var(--g1);}
+.faq-q-text{font-family:var(--title);font-weight:700;font-size:15px;color:var(--text);}
+.faq-icon{width:28px;height:28px;border-radius:50%;background:var(--gl);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s;font-size:14px;color:var(--gt);font-weight:700;}
+.faq-a{display:none;padding:0 var(--c) 20px;color:var(--g5);font-size:14.5px;line-height:1.75;max-width:760px;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--green);border-color:var(--green2);color:#111;}
+.faq-item.open .faq-q{background:var(--g1);}
+
+/* CTA */
+.cta{padding:var(--s) 56px;background:var(--g3);border-top:3px solid var(--green);text-align:center;}
+.cta-inner{max-width:640px;margin:0 auto;}
+.cta h2{color:var(--text);font-size:44px;margin-bottom:16px;}
+.cta p{color:var(--g5);font-size:17px;margin-bottom:var(--b);line-height:1.75;}
+.cta-btns{display:flex;gap:14px;justify-content:center;}
+.btn-cta{background:var(--green);color:#111;border:1.5px solid var(--green2);border-radius:10px;padding:16px 36px;font-family:var(--title);font-weight:700;font-size:16px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:9px;box-shadow:0 4px 16px rgba(125,201,0,.3);}
+.btn-cta:hover{background:var(--green2);transform:translateY(-2px);}
+.btn-cta-out{background:var(--w);color:var(--text);border:1.5px solid var(--g4);border-radius:10px;padding:15px 28px;font-weight:500;font-size:15px;cursor:pointer;}
+.btn-cta-out:hover{border-color:var(--g5);}
+
+/* FOOTER */
+footer{background:#1a1a1a;padding:56px 56px 32px;}
+.footer-top{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid #333;}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.footer-logo-mark{width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;}
+.footer-logo-text{font-family:var(--title);font-weight:800;font-size:17px;color:#fff;}
+.footer-logo-text span{color:var(--green);}
+.footer-desc{color:#888;font-size:13.5px;line-height:1.75;max-width:260px;margin-bottom:20px;}
+.social-row{display:flex;gap:10px;}
+.social-btn{width:34px;height:34px;border-radius:8px;background:#2a2a2a;border:1px solid #333;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.social-btn:hover{background:#333;border-color:var(--green);}
+.footer-col-title{font-family:var(--title);font-size:13px;font-weight:700;color:#fff;margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-links a{color:#888;font-size:13px;text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:var(--green);}
+.footer-bottom{max-width:1140px;margin:24px auto 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-bottom p{color:#555;font-size:12px;}
+.footer-badge{display:flex;align-items:center;gap:6px;background:#2a2a2a;border:1px solid #333;border-radius:6px;padding:5px 12px;font-size:11px;color:#888;}
+.footer-bottom-links{display:flex;gap:20px;}
+.footer-bottom-links a{color:#555;font-size:12px;text-decoration:none;}
+.footer-bottom-links a:hover{color:#888;}
+.wa{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 20px rgba(37,211,102,.45);cursor:pointer;z-index:200;animation:fl 3s ease-in-out infinite;}
+
+
+.main-nav{position:sticky;top:0;}
+.nav-links{list-style:none;}
+.nav-links li{list-style:none;}
+.nav-links a{white-space:nowrap;}
+.nav-links .btn-reg{display:inline-block;padding:10px 8px;}
+
+.nav-toggle{display:none;border:1px solid var(--g4);background:var(--w);width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;cursor:pointer;}
+.nav-toggle-bar{display:block;width:18px;height:2px;background:#111;margin:3px 0;}
+
+.admin-link{color:#ff5b5b !important;font-weight:700 !important;}
+
+.app-tabbar{display:none;}
+html.native-app .app-tabbar{display:flex;position:fixed;left:12px;right:12px;bottom:max(10px, env(safe-area-inset-bottom));background:#fff;border:1px solid var(--g4);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.12);z-index:210;overflow:hidden;}
+html.native-app .app-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-decoration:none;padding:9px 6px;color:#666;font-size:11px;font-weight:600;}
+html.native-app .app-tab-ico{width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:currentColor;}
+html.native-app .app-tab-ico svg{width:18px;height:18px;display:block;}
+html.native-app .app-tab.active{color:var(--gt);background:var(--gl);}
+html.native-app body{padding-bottom:86px;}
+html.native-app .main-nav{top:0;padding-top:max(12px, env(safe-area-inset-top));height:calc(68px + max(12px, env(safe-area-inset-top)));}
+html.native-app .hero{padding-top:48px;}
+
+@media (max-width: 1100px){
+  .hero-inner{grid-template-columns:1fr;gap:42px;}
+  h1{font-size:52px;}
+  .steps,.testi-grid,.pricing-grid{grid-template-columns:repeat(2,1fr);}
+  .feat-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width: 900px){
+  .main-nav{padding:0 14px;gap:10px;}
+  .nav-toggle{display:flex;}
+  .nav-links{display:none;position:fixed;top:72px;left:12px;right:12px;background:#fff;border:1px solid var(--g4);border-radius:12px;padding:10px;flex-direction:column;align-items:stretch;gap:4px;box-shadow:0 10px 24px rgba(0,0,0,.1);z-index:250;}
+  .main-nav.menu-open .nav-links{display:flex;}
+  .nav-links a{display:block;padding:11px 10px;border-radius:8px;}
+  .nav-links .btn-client{display:block;text-align:center;}
+  .hero,.features,.how,.testi,.pricing,.faq,.cta,footer{padding-left:18px;padding-right:18px;}
+  h1{font-size:46px;letter-spacing:-1px;}
+  h2{font-size:34px;}
+  .stats-inner,.steps,.testi-grid,.pricing-grid,.feat-grid{grid-template-columns:1fr;}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(0,0,0,.12);padding:14px 0;}
+  .stat-item:last-child{border-bottom:none;}
+  .footer-top{grid-template-columns:1fr;gap:24px;}
+  .cta-btns{flex-direction:column;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <a class="logo nav-logo" href="index.html">
+    <div class="logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13"/><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg></div>
+    <span class="logo-text nav-brand">Comercio <span>e-Bogotá</span></span>
+  </a>
+  <ul class="nav-links nav-menu">
+    <li><a href="#caracteristicas">Características</a></li>
+    <li><a href="#como-funciona">¿Cómo funciona?</a></li>
+    <li><a href="#planes">Planes</a></li>
+    <li><a href="negocio.html">Clientes inscritos</a></li>
+    <li><a class="btn-reg" href="registro.html">Registrarse</a></li>
+    <li><a class="btn-client nav-btn" href="panel.html">Ya soy cliente →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow"><span class="eyebrow-dot"></span><span class="eyebrow-text">Plataforma de Publicidad Digital — Bogotá, Colombia</span></div>
+      <h1>Tu negocio,<br><em>visible</em><br>en toda la ciudad</h1>
+      <p class="hero-sub">Comercio e-Bogotá conecta tu negocio con miles de clientes que buscan productos y servicios — desde cualquier dispositivo, 7 días a la semana.</p>
+      <div class="hero-btns">
+        <a href="registro.html" class="btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Registrarme gratis</a>
+        <a href="panel.html" class="btn-outline">Ya soy cliente →</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-item"><div class="trust-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Sin tarjeta de crédito</div>
+        <div class="trust-item"><div class="trust-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Activo en 5 minutos</div>
+        <div class="trust-item"><div class="trust-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Soporte 7 días</div>
+      </div>
+    </div>
+
+    <!-- ILUSTRACIÓN SVG HERO -->
+    <div class="hero-visual">
+      <svg viewBox="0 0 460 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- fondo ciudad abstracta -->
+        <rect x="0" y="280" width="460" height="120" rx="0" fill="#f0f0f0"/>
+        <rect x="20" y="220" width="60" height="80" rx="6" fill="#e4e4e4"/>
+        <rect x="30" y="232" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="50" y="232" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="30" y="252" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="50" y="252" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="100" y="190" width="50" height="110" rx="6" fill="#e8e8e8"/>
+        <rect x="108" y="200" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="124" y="200" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="108" y="218" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="124" y="218" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="108" y="236" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="124" y="236" width="10" height="10" rx="2" fill="#d0d0d0"/>
+        <rect x="370" y="200" width="70" height="100" rx="6" fill="#e4e4e4"/>
+        <rect x="380" y="212" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="398" y="212" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="416" y="212" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="380" y="232" width="12" height="12" rx="2" fill="#d0d0d0"/>
+        <rect x="398" y="232" width="12" height="12" rx="2" fill="#d0d0d0"/>
+
+        <!-- CELULAR -->
+        <rect x="155" y="60" width="150" height="260" rx="22" fill="#1a1a1a"/>
+        <rect x="163" y="72" width="134" height="236" rx="16" fill="#f8f8f8"/>
+        <rect x="210" y="65" width="40" height="6" rx="3" fill="#333"/>
+
+        <!-- pantalla WhatsApp -->
+        <rect x="163" y="72" width="134" height="28" rx="0" fill="#2d6200"/>
+        <rect x="163" y="72" width="134" height="28" rx="16" fill="#2d6200"/>
+        <rect x="163" y="86" width="134" height="14" fill="#2d6200"/>
+        <circle cx="182" cy="86" r="9" fill="#7dc900"/>
+        <text x="196" y="90" font-family="system-ui" font-size="8" fill="#fff" font-weight="700">Comercio e-Bogotá</text>
+        <text x="196" y="99" font-family="system-ui" font-size="6" fill="#b8e870">en línea</text>
+
+        <!-- burbujas chat -->
+        <rect x="170" y="108" width="90" height="32" rx="10" fill="#edfacc"/>
+        <text x="178" y="120" font-family="system-ui" font-size="7" fill="#2d6200" font-weight="700">🔥 30% de descuento</text>
+        <text x="178" y="132" font-family="system-ui" font-size="6" fill="#4a8f00">Solo esta semana · Barbería</text>
+
+        <rect x="170" y="148" width="80" height="28" rx="10" fill="#edfacc"/>
+        <text x="178" y="160" font-family="system-ui" font-size="7" fill="#2d6200" font-weight="700">🎁 2x1 fin de semana</text>
+        <text x="178" y="170" font-family="system-ui" font-size="6" fill="#4a8f00">48 clientes notificados</text>
+
+        <rect x="172" y="184" width="96" height="44" rx="10" fill="#fff" stroke="#e0e0e0" stroke-width="1"/>
+        <text x="180" y="198" font-family="system-ui" font-size="6.5" fill="#555">📊 Resumen de hoy</text>
+        <text x="180" y="210" font-family="system-ui" font-size="7" fill="#2d6200" font-weight="700">1.2K visitas · 48 contactos</text>
+        <text x="180" y="222" font-family="system-ui" font-size="6" fill="#999">actualizado hace 2 min</text>
+
+        <!-- botón enviar -->
+        <rect x="170" y="236" width="118" height="26" rx="8" fill="#7dc900"/>
+        <text x="210" y="253" font-family="system-ui" font-size="7.5" fill="#111" font-weight="700" text-anchor="middle">📲 Enviar promo</text>
+
+        <!-- barra inferior -->
+        <rect x="163" y="280" width="134" height="28" rx="0" fill="#f0f0f0"/>
+        <rect x="163" y="294" width="134" height="14" fill="#f0f0f0"/>
+        <rect x="163" y="280" width="134" height="28" rx="16" fill="#f0f0f0"/>
+        <circle cx="210" cy="294" r="5" fill="#d0d0d0"/>
+        <circle cx="228" cy="294" r="5" fill="#7dc900"/>
+        <circle cx="246" cy="294" r="5" fill="#d0d0d0"/>
+
+        <!-- íconos negocios flotantes -->
+        <circle cx="80" cy="140" r="28" fill="#edfacc" stroke="#b8e870" stroke-width="1.5"/>
+        <text x="80" y="145" font-size="18" text-anchor="middle" font-family="system-ui">💈</text>
+        <circle cx="380" cy="120" r="28" fill="#edfacc" stroke="#b8e870" stroke-width="1.5"/>
+        <text x="380" y="125" font-size="18" text-anchor="middle" font-family="system-ui">🍽️</text>
+        <circle cx="60" cy="320" r="22" fill="#fff" stroke="#d0d0d0" stroke-width="1.5"/>
+        <text x="60" y="325" font-size="14" text-anchor="middle" font-family="system-ui">👗</text>
+        <circle cx="400" cy="310" r="22" fill="#fff" stroke="#d0d0d0" stroke-width="1.5"/>
+        <text x="400" y="315" font-size="14" text-anchor="middle" font-family="system-ui">🔧</text>
+
+        <!-- líneas punteadas conexión -->
+        <line x1="108" y1="140" x2="155" y2="160" stroke="#b8e870" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="352" y1="120" x2="305" y2="150" stroke="#b8e870" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="82" y1="298" x2="163" y2="250" stroke="#d0d0d0" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="378" y1="295" x2="297" y2="260" stroke="#d0d0d0" stroke-width="1" stroke-dasharray="3 3"/>
+      </svg>
+
+      <div class="float-chip fc1"><span class="chip-dot"></span>Enviado a 48 clientes</div>
+      <div class="float-chip fc2"><span class="chip-dot"></span>+120 visitas hoy</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">7x24</div><div class="stat-lbl">Disponibilidad</div></div>
+    <div class="stat-item"><div class="stat-num" id="indexStatMaxImages">10</div><div class="stat-lbl">Imágenes por negocio</div></div>
+    <div class="stat-item"><div class="stat-num" id="indexStatMaxPromos">4</div><div class="stat-lbl">Promociones al mes</div></div>
+    <div class="stat-item"><div class="stat-num" id="indexStatTrialDays">30</div><div class="stat-lbl">Días de prueba gratis</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="caracteristicas" class="features">
+  <div class="features-inner">
+    <div class="sec-tag-wrap"><span class="sec-tag">Características</span></div>
+    <h2>Todo lo que necesita<br>tu <em>negocio</em> en Bogotá</h2>
+    <p class="sec-sub">Herramientas para que más clientes te encuentren, te contacten y te compren.</p>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="feat-title">Página pública de tu negocio</div><div class="feat-desc">URL propia, fotos, descripción y botón de contacto. Visible 24/7.</div></div>
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="feat-title">Envío masivo por WhatsApp</div><div class="feat-desc">Crea ofertas y envíalas a todos tus clientes con un clic.</div></div>
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="feat-title">CRM de contactos</div><div class="feat-desc">Organiza celulares e importa listas desde Excel en segundos.</div></div>
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><polyline points="22 20 2 20"/></svg></div><div class="feat-title">Estadísticas en tiempo real</div><div class="feat-desc">Visitas, conversiones y mejores horarios de contacto.</div></div>
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><div class="feat-title">Promociones ilimitadas</div><div class="feat-desc">Descuentos, 2x1, lanzamientos. Sin costo adicional.</div></div>
+      <div class="feat-card"><div class="feat-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="feat-title">Visibilidad en Bogotá</div><div class="feat-desc">Aparece donde clientes buscan lo que tú ofreces.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="como-funciona" class="how">
+  <div class="how-inner">
+    <div class="sec-tag-wrap"><span class="sec-tag">Cómo funciona</span></div>
+    <h2>Activo en <em>4 pasos</em> simples</h2>
+    <p class="sec-sub">En minutos tu negocio está publicado y llegando a nuevos clientes.</p>
+    <div class="steps">
+      <div class="step"><div class="step-arr">→</div><div class="step-num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="step-title">Regístrate gratis</div><div class="step-desc"><span id="indexStepTrialDesc">Solicita tu código de prueba gratuita (30 días) a través de WhatsApp. Ingrésalo en MI CUENTA.</span></div></div>
+      <div class="step"><div class="step-arr">→</div><div class="step-num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div><div class="step-title">Publica tu negocio</div><div class="step-desc">Fotos, descripción y datos de contacto.</div></div>
+      <div class="step"><div class="step-arr">→</div><div class="step-num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="step-title">Carga tus contactos</div><div class="step-desc">Importa celulares desde Excel fácilmente.</div></div>
+      <div class="step"><div class="step-num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="step-title">¡Envía y vende más!</div><div class="step-desc">Lanza promociones por WhatsApp con un clic.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="testi">
+  <div class="testi-inner">
+    <div class="sec-tag-wrap"><span class="sec-tag">Testimonios</span></div>
+    <h2>Lo que dicen nuestros <em>clientes</em></h2>
+    <p class="sec-sub">Más de 2.400 negocios en Bogotá ya están creciendo.</p>
+    <div class="testi-grid">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Desde que uso e-Bogotá mis clientes me contactan directamente por WhatsApp. Las promociones funcionan increíble."</p><div class="testi-author"><div class="testi-av">C</div><div><div class="testi-name">Carlos Mendoza</div><div class="testi-biz">Barbería Estilo Único · Chapinero</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Subí mis ventas un 40% el primer mes. La función de envío masivo por WhatsApp es lo mejor."</p><div class="testi-author"><div class="testi-av" style="background:#3aaa6a">M</div><div><div class="testi-name">María Rodríguez</div><div class="testi-biz">Restaurante La Cazuela · Usaquén</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"En 10 minutos tenía mi negocio publicado y mis clientes ya podían encontrarme en la plataforma."</p><div class="testi-author"><div class="testi-av" style="background:#7c3aed">A</div><div><div class="testi-name">Andrés López</div><div class="testi-biz">Tienda Deportiva Run · Suba</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="planes" class="pricing">
+  <div class="pricing-inner">
+    <div class="sec-tag-wrap"><span class="sec-tag">// Planes de publicidad</span></div>
+    <h2>Sin cláusulas de <em>permanencia</em></h2>
+    <p class="sec-sub">Todos los planes incluyen exactamente las mismas características.<br>El precio varía según el tiempo elegido.</p>
+    <div class="pricing-grid" id="plansGrid">
+
+      <div class="plan-card" data-plan-months="1">
+        <div class="plan-badge-trial">Prueba inicial</div>
+        <div class="plan-name plan-tag">Plan 1 mes</div>
+        <div class="plan-price">$10.000<span>/mes</span></div>
+        <div class="plan-period plan-total">Sin descuento adicional</div>
+        <div class="plan-note">Ideal para conocer la plataforma antes de comprometerte.</div>
+        <div class="plan-features plan-list">
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>10 imágenes de productos</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>4 promociones semanales</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Página de negocio propia</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>URL amigable personalizada</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Panel de administración</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Soporte por WhatsApp</div>
+        </div>
+        <button class="btn-plan-out">Seleccionar</button>
+      </div>
+
+      <div class="plan-card featured" data-plan-months="3">
+        <div class="plan-badge">⚡ Más popular</div>
+        <div class="plan-name plan-tag">Plan 3 meses</div>
+        <div class="plan-price">$90.000<span>/mes</span></div>
+        <div class="plan-period plan-total">Total: $270.000</div>
+        <div class="plan-features plan-list">
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>10 imágenes de productos</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>4 promociones semanales</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Página de negocio propia</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>URL amigable personalizada</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Panel de administración</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Soporte por WhatsApp</div>
+        </div>
+        <button class="btn-plan">Seleccionar →</button>
+      </div>
+
+      <div class="plan-card" data-plan-months="6">
+        <div class="plan-name plan-tag">Plan 6 meses</div>
+        <div class="plan-price">$130.000<span>/mes</span></div>
+        <div class="plan-period plan-total">Total: $780.000</div>
+        <div class="plan-features plan-list">
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>10 imágenes de productos</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>4 promociones semanales</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Página de negocio propia</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>URL amigable personalizada</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Panel de administración</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Soporte por WhatsApp</div>
+        </div>
+        <button class="btn-plan-out">Seleccionar</button>
+      </div>
+
+      <div class="plan-card" data-plan-months="12">
+        <div class="plan-name plan-tag">Plan 12 meses</div>
+        <div class="plan-price">$270.000<span>/mes</span></div>
+        <div class="plan-period plan-total">Total: $3.240.000</div>
+        <div class="plan-features plan-list">
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>10 imágenes de productos</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>4 promociones semanales</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Página de negocio propia</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>URL amigable personalizada</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Panel de administración</div>
+          <div class="plan-feat"><div class="pfc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2d6200" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Soporte por WhatsApp</div>
+        </div>
+        <button class="btn-plan-out">Seleccionar</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div class="sec-tag-wrap"><span class="sec-tag">Preguntas frecuentes</span></div>
+    <h2>Resolvemos tus <em>dudas</em></h2>
+    <p class="sec-sub">Todo lo que necesitas saber antes de empezar.</p>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="faq-q-text">¿Necesito conocimientos técnicos para usar la plataforma?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">No, para nada. Comercio e-Bogotá está diseñado para que cualquier dueño de negocio pueda usarlo sin experiencia técnica. En menos de 5 minutos puedes tener tu página publicada y empezar a enviar promociones por WhatsApp. Si tienes alguna duda, nuestro equipo de soporte te guía paso a paso por WhatsApp.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="faq-q-text">¿Cómo funciona el envío de promociones por WhatsApp?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Cargas los celulares de tus clientes en la plataforma, creas tu mensaje de promoción y con un clic se abre WhatsApp con el mensaje listo para enviar a cada contacto. El mensaje llega personalizado con el nombre de cada cliente. No necesitas WhatsApp Business ni ninguna integración especial.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="faq-q-text">¿Puedo cancelar mi plan en cualquier momento?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Sí, absolutamente. No tenemos cláusulas de permanencia ni contratos obligatorios. Puedes cancelar tu plan cuando quieras sin penalizaciones. Tu negocio permanecerá activo hasta que termine el período que ya pagaste.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="faq-q-text">¿Qué diferencia hay entre el Plan 1 mes y los demás?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Todos los planes incluyen exactamente las mismas características — página pública, promociones, CRM de contactos, panel de administración y soporte. La diferencia es el tiempo de vigencia y el precio. El Plan 1 mes es ideal para probar la plataforma antes de comprometerte con un plan más largo. Los planes de mayor duración tienen mejor precio por mes.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="faq-q-text">¿Mi negocio aparece en Google o solo en la plataforma?</span>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Tu página de negocio en Comercio e-Bogotá tiene una URL propia y amigable que puede ser indexada por Google. Además, dentro de la plataforma tu negocio aparece en búsquedas de clientes que están buscando productos o servicios en Bogotá, lo que te da visibilidad local inmediata tanto dentro como fuera de la plataforma.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner">
+    <h2>¿Listo para que más clientes<br>encuentren tu <em>negocio?</em></h2>
+    <p>Únete a más de 2.400 negocios bogotanos. Sin tarjeta de crédito, sin contratos.</p>
+    <div class="cta-btns">
+      <a href="registro.html" class="btn-cta"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Registrarme gratis ahora</a>
+      <a href="#planes" class="btn-cta-out">Ver todos los planes →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">
+        <div class="footer-logo-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13"/><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg></div>
+        <span class="footer-logo-text">Comercio <span>e-Bogotá</span></span>
+      </div>
+      <p class="footer-desc">La plataforma de publicidad digital para negocios bogotanos. Conecta con tus clientes, envía promociones y crece.</p>
+      <div class="social-row">
+        <div class="social-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+        <div class="social-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+        <div class="social-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div>
+        <div class="social-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><path d="M21 2H3v16h5v4l4-4h5l4-4V2zM11 11V7m4 4V7"/></svg></div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Plataforma</div>
+      <div class="footer-links">
+        <a href="index.html#caracteristicas">Características</a>
+        <a href="index.html#como-funciona">¿Cómo funciona?</a>
+        <a href="index.html#planes">Planes y precios</a>
+        <a href="negocio.html">Clientes inscritos</a>
+        <a href="panel.html">Panel cliente</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Soporte</div>
+      <div class="footer-links">
+        <a href="index.html#faq">Centro de ayuda</a>
+        <a href="index.html#como-funciona">Tutoriales</a>
+        <a href="https://wa.me/573000000000" target="_blank" rel="noopener">WhatsApp soporte</a>
+        <a href="panel.html">Reportar un problema</a>
+        <a href="/health/live" target="_blank" rel="noopener">Estado del sistema</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a href="registro.html#terminos">Términos de servicio</a>
+        <a href="registro.html#privacidad">Política de privacidad</a>
+        <a href="registro.html#privacidad">Política de cookies</a>
+        <a href="registro.html#privacidad">Habeas Data</a>
+        <a href="https://wa.me/573000000000" target="_blank" rel="noopener">Contacto</a>
+        <a href="admin.html" class="admin-link">&bull; Admin plataforma</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Comercio e-Bogotá · Todos los derechos reservados · Bogotá, Colombia</p>
+    <div class="footer-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7dc900" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Hecho en Colombia 🇨🇴</div>
+    <div class="footer-bottom-links"><a href="#">Términos</a><a href="#">Privacidad</a><a href="#">Cookies</a></div>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/573000000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg width="24" height="24" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path fill="#fff" d="M16 3.2c-7.07 0-12.8 5.73-12.8 12.8 0 2.24.58 4.42 1.68 6.35L3 29l6.88-1.8A12.75 12.75 0 0 0 16 28.8h.01c7.07 0 12.79-5.73 12.79-12.8 0-3.42-1.33-6.63-3.74-9.05A12.72 12.72 0 0 0 16 3.2Zm0 23.4h-.01a10.6 10.6 0 0 1-5.4-1.47l-.39-.23-4.07 1.07 1.1-3.98-.25-.4A10.58 10.58 0 0 1 5.37 16c0-5.85 4.76-10.6 10.61-10.6 2.83 0 5.49 1.1 7.49 3.1s3.1 4.66 3.1 7.5c0 5.84-4.76 10.6-10.61 10.6Zm5.81-8.2c-.32-.16-1.88-.93-2.17-1.03-.29-.1-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.19.21-.38.23-.7.08-.32-.16-1.35-.5-2.57-1.58-.95-.85-1.6-1.89-1.79-2.21-.19-.32-.02-.49.14-.65.15-.15.32-.38.48-.57.16-.19.21-.32.31-.53.1-.21.05-.4-.03-.57-.08-.16-.7-1.69-.96-2.32-.25-.6-.5-.52-.7-.53h-.6c-.21 0-.55.08-.84.4-.29.31-1.1 1.08-1.1 2.63 0 1.55 1.13 3.06 1.28 3.27.16.21 2.2 3.35 5.32 4.7.74.32 1.32.51 1.77.65.75.24 1.43.2 1.98.12.6-.09 1.88-.77 2.15-1.52.27-.75.27-1.4.19-1.53-.08-.13-.27-.21-.59-.37Z"/>
+  </svg>
+</a>
+<script src="js/app.js?v=20260320fix8"></script>
+<script src="js/integration.js?v=20260324fix2"></script>
+<script src="js/index-plans.js?v=20260320fix8"></script>
+<span id="indexPromoCtaDays" hidden>30 días gratis</span>
+</body>
+</html>
+
+
+
+
+

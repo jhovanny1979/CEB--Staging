@@ -1,0 +1,9 @@
+﻿__pycache__/
+*.pyc
+.env
+.venv/
+vendor_lib/
+.pytest_cache/
+tests/test.db
+tests/.pytest_cache/
+pytest-cache-files-*/

@@ -1,0 +1,36 @@
+# Python cache
+**/__pycache__/
+*.py[cod]
+
+# Pytest/temp
+.pytest_cache/
+pytest-cache-files-*/
+*.tmp
+
+# Virtual environments
+.venv/
+venv/
+backend/.venv/
+
+# Local dependency bundles
+backend/vendor_lib/
+
+# Environment files
+.env
+.env.*
+
+# Logs and local runtime files
+*.log
+*.pid
+http-server.err.log
+.localhost-bg.pids.json
+
+# Local data artifacts
+var/uploads/
+var/tmp/
+
+# Mobile APK artifacts
+mobile-apk/node_modules/
+mobile-apk/android/.gradle/
+mobile-apk/android/app/build/
+CEB-mobile-debug.apk

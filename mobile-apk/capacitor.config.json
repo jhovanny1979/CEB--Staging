@@ -1,0 +1,21 @@
+﻿{
+    "appId":  "co.comercioebogota.app",
+    "appName":  "Comercio e-Bogota",
+    "webDir":  "www",
+    "plugins":  {
+                    "StatusBar":  {
+                                      "overlaysWebView":  false,
+                                      "backgroundColor":  "#F5F5F5",
+                                      "style":  "DARK"
+                                  }
+                },
+    "server":  {
+                   "cleartext":  true,
+                   "allowNavigation":  [
+                                           "192.168.10.12",
+                                           "127.0.0.1",
+                                           "localhost",
+                                           "*.local"
+                                       ]
+               }
+}
